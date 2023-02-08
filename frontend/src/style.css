@@ -1,0 +1,42 @@
+body {
+    /* background-color: lightblue; */
+      background-color: gray;
+  }
+  
+.question{
+    
+    text-align: center;
+}
+
+.form {
+    background-color: #fff;
+    /* background-color: lightcoral; */
+    width:100%;
+    /* max-width: 500px; */
+    margin: auto;
+    margin-top: 50px;
+      padding-top: 15px;
+      padding-right: 15px;
+      padding-bottom: 15px;
+      padding-left: 15px;
+    box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.5);
+    text-align: left;
+    border-radius: 25px;
+}
+
+.fieldset{
+    border-radius: 25px;
+}
+
+.formButton
+{
+    /* margin: 5px; */
+        margin-top: 8px;
+    
+        margin-right: 5px;
+    
+        margin-bottom: 8px;
+    
+        margin-left: 5px;
+}
+

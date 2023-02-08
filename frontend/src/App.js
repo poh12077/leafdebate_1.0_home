@@ -1,54 +1,31 @@
 import { Component } from 'react';
-import axios from "axios";
-// import React from 'react';
+import MainPage from './components/MainPage';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Test from './components/Test';
+import './style.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-class App extends Component{
+class App extends Component {
 
-  constructor(){
-    super();
-    this.state={
-      isChecked : false
+    render() {
+        return (
+            <div className="App">
+     
+            <BrowserRouter>
+                  <Routes>
+                      <Route path={"/MainPage"} element={<MainPage />}></Route>
+                      <Route path={"/Login"} element={<Login />}></Route>
+                      <Route path={"/Signup"} element={<Signup />}></Route>
+                      <Route path={"/"} element={<MainPage />}></Route>
+                      <Route path={"/test"} element={<Test />}></Route>
+                  </Routes>
+                </BrowserRouter>
+              </div>
+
+        )
     }
-  }
 
-  handleChange = (e) =>{
-    this.setState({
-      isChecked: e.target.checked
-    })
-  }
-
-  handleFormSubmit = (e) =>{
-    e.preventDefault();
-    this.check();
-  }
-
-  check = () =>{
-    const url = '/check';
-    const formData = new FormData();
-    formData.append('isChecked', this.state.isChecked);
-    const config = {
-        headers: {
-            'content-type': 'multipart/form-data'
-        }
-    }
-    return axios.post(url, formData, config);
-  }
-
-  render(){
-    return(
-      <form onSubmit={this.handleFormSubmit}>
-      <label>
-      <input 
-          type="checkbox"
-          // checked={this.state.isChecked}
-          onChange={this.handleChange}
-        /> {this.state.isChecked.toString()}
-      </label>
-      <br/>
-      <button type="submit">adding</button>
-      </form>
-    )
-  }
 
 }
 

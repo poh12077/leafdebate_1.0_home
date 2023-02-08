@@ -1,7 +1,7 @@
 {
     "user": "postgres",
     "host": "localhost",
-    "database": "sesame",
+    "database": "leafdebate",
     "password": "dudghk12#*",
     "port": 5432
 }
