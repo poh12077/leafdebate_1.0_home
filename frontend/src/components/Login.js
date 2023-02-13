@@ -102,7 +102,7 @@ function goToSignup() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              leaf debate
+              깻잎 논쟁
             </Typography>
             <Button color="inherit" onClick={goToMainPage} >MainPage</Button>
           </Toolbar>
@@ -110,7 +110,7 @@ function goToSignup() {
       </Box>
       <div className="page">
         <form className="cover" onSubmit={handleSubmit}>
-          <h1>leaf debate</h1>
+          <h1>깻잎 논쟁</h1>
           <input className="loginInput"
             type="text"
             name="id"
@@ -127,8 +127,8 @@ function goToSignup() {
           />
           <button className="login-btn" type="submit">Login</button>
           <button className="login-btn" type="submit" onClick={goToSignup}>Sign Up</button>
-          <GoogleOauthLogin></GoogleOauthLogin>
-          <GoogleOauthLogout></GoogleOauthLogout>
+          {/* <GoogleOauthLogin></GoogleOauthLogin>
+          <GoogleOauthLogout></GoogleOauthLogout> */}
 
         </form>
       </div>

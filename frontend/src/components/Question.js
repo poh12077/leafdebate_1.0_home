@@ -12,7 +12,7 @@ class Question extends React.Component {
     super(props);
     this.child = React.createRef();
     this.state = {
-      options: this.props.options ,
+      options: this.props.options,
       checkedOption: "",
       questionNum: 0
     }
@@ -51,13 +51,17 @@ class Question extends React.Component {
       timeout: 5000
     }).then(
       (res) => {
-        this.child.current.stateRefresh();
-        // window.location.reload();
+        if (res.data.login === false) {
+          alert("you should login first");
+        } else {
+          this.child.current.stateRefresh();
+          // window.location.reload();
+        }
       }
     ).catch(
-        () =>{
-          console.log('no response from server');
-        }
+      () => {
+        console.log('no response from server');
+      }
     )
   }
 
@@ -90,7 +94,7 @@ class Question extends React.Component {
       <div className='question'>
         <form className="form" onSubmit={this.handleFormSubmit}>
           <fieldset className="fieldset" >
-            <legend>{this.props.questionNum+". "+this.props.questionStatement }</legend>
+            <legend>{this.props.questionNum + ". " + this.props.questionStatement}</legend>
             {
               this.state.options.map(option => (
                 <div>

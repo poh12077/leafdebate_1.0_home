@@ -81,7 +81,7 @@ function Signup() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            leaf debate
+                            깻잎논쟁
                         </Typography>
                         <Button color="inherit" onClick={goToMainPage} >mainPage</Button>
                     </Toolbar>
@@ -89,7 +89,7 @@ function Signup() {
             </Box>
             <div className="page">
                 <form className="cover" onSubmit={handleSubmit}>
-                    <h1>leaf debate</h1>
+                    <h1>깻잎 논쟁</h1>
                     <input className="loginInput"
                         type="text"
                         name="id"

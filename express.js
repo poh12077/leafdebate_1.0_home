@@ -5,10 +5,13 @@ const port = process.env.PORT || 8000;
 const { Client } = require("pg");
 const fs = require('fs');
 const multer = require('multer')();
+const cookieParser = require('cookie-parser');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended:true }));
 app.use(multer.array());
+const cookieSecretKey='dbstjrduf12#$';
+app.use(cookieParser(cookieSecretKey));
 
 const data = fs.readFileSync('./db.json');
 const conf = JSON.parse(data);
@@ -23,9 +26,19 @@ const connection = new Client({
 
 connection.connect();
 
+const cookieConfig = {
+  httpOnly: true,
+  maxAge : 1209600000,  // 14 days
+  signed:true
+}
 
-
+//when user check option
 app.post('/questionAnswer', (req,res)=>{
+  try {
+    if(req.signedCookies.login==='false'){
+      throw new Error();
+    }
+
     let checkedOption = req.body.checkedOption;
     let questionNum= req.body.questionNum;
     let gender = req.body.gender;
@@ -48,8 +61,16 @@ app.post('/questionAnswer', (req,res)=>{
       console.log(err);
       // connection.end;
     })
+
+  } catch (error) {
+    res.send({
+      login:false
+    });
+  }
+    
   })
 
+  //login
   app.post('/sendAccount', (req,res)=>{
     let id = req.body.id;
     let sql = {
@@ -60,6 +81,7 @@ app.post('/questionAnswer', (req,res)=>{
     .then((DBRes)=>{
       if (req.body.password === DBRes.rows[0].password ){
         //success
+        res.cookie('login', 'true', cookieConfig);
         res.send();
       }else{
         //password wrong
@@ -77,7 +99,7 @@ app.post('/questionAnswer', (req,res)=>{
     })
   })
 
-  
+  //sign up
   app.post('/sendSignupInfo', (req,res)=>{
     let id = req.body.id;
     let password =req.body.password;
@@ -90,6 +112,7 @@ app.post('/questionAnswer', (req,res)=>{
     }
     connection.query(sql )
     .then((DBRes)=>{
+      res.cookie('login', 'true', cookieConfig);
       res.send(DBRes.rows);
     })
     .catch((err)=>{
@@ -97,7 +120,7 @@ app.post('/questionAnswer', (req,res)=>{
     })
   })
 
-
+//when backend send response result to browser
   app.post('/api/responseResult',(req,res)=>{
     let tableName='totalresponseresult';
     let gender =req.body.gender;
@@ -117,6 +140,12 @@ app.post('/questionAnswer', (req,res)=>{
      
     })
 
+  })
+
+  //logout
+  app.get('/logout',(req,res)=>{
+    res.cookie('login','false', cookieConfig);
+    res.send();
   })
   
 app.listen(port, () => {

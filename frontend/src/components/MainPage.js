@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-
+import axios from "axios";
 
 let MainPage = () => {
 
@@ -24,6 +24,23 @@ let MainPage = () => {
 
     function goToSignup() {
         movePage('/Signup');
+    }
+
+    function logout(){
+        axios({
+            method: 'get',
+            url: '/logout',
+            validateStatus: function (status) {
+              return status >= 200 && status < 300; // default
+            },
+            timeout: 5000
+          }).then(
+            ()=>{
+                alert('you are logout');
+            }
+          ).catch(
+          
+          )
     }
 
     return (
@@ -42,10 +59,11 @@ let MainPage = () => {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            leaf debate
+                            깻잎 논쟁
                         </Typography>
                         <Button color="inherit" onClick={goToLogin} >Login</Button>
                         <Button color="inherit" onClick={goToSignup} >Sign-up</Button>
+                        <Button color="inherit" onClick={logout} >Logout</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
