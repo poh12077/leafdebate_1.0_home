@@ -51,9 +51,16 @@ class Question extends React.Component {
       timeout: 5000
     }).then(
       (res) => {
-        if (res.data.login === false) {
+        if (!res.data.login) {
+          console.log(typeof res.data.login);
+          // login have not been done
           alert("you should login first");
+        }else if (res.data.didUserCheck){
+          //votiong was already done
+          alert("you cannot vote more than two times");
         } else {
+          //voting is working 
+          alert("It's been voted")
           this.child.current.stateRefresh();
           // window.location.reload();
         }
@@ -64,30 +71,6 @@ class Question extends React.Component {
       }
     )
   }
-
-  // check = () => {
-  //   const url = '/questionAnswer';
-  //   const formData = new FormData();
-  //   formData.append('checkedOption', this.state.checkedOption);
-  //   formData.append('questionNum', this.state.questionNum);
-  //   // formData.append('gender','male');
-  //   formData.append('gender','female');
-  //   formData.append('tabName', this.props.tabName);
-
-  //   const config = {
-  //     headers: {
-  //       'content-type': 'multipart/form-data'
-  //     }
-  //   }
-  //   axios.post(url, formData, config).then(
-  //     (res)=>{
-  //           this.child.current.stateRefresh();
-  //       // window.location.reload();
-  //     }
-  //   );
-  // }
-
-
 
   render() {
     return (
