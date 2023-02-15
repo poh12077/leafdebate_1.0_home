@@ -50,8 +50,8 @@ let updateDoesUserCheck = (res, tabName, questionNum, id) => {
   connection.query(sql)
     .then((DBRes) => {
       res.send({
-        login:true,
-        didUserCheck:false
+        login: true,
+        didUserCheck: false
       });
       console.log(DBRes);
     })
@@ -63,13 +63,13 @@ let updateDoesUserCheck = (res, tabName, questionNum, id) => {
 
 let didUserCheck = (tabName, questionNum, id) => {
   return new Promise(
-    (resolve, reject)=>{
+    (resolve, reject) => {
       let tableName = tabName + '_did_user_check';
       let qn_num = 'qn_' + questionNum.toString();
       sql = {
         text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
       }
-       connection.query(sql)
+      connection.query(sql)
         .then((DBRes) => {
           if (DBRes.rows[0][qn_num]) {
             resolve(true);
@@ -100,7 +100,7 @@ app.post('/questionAnswer', async (req, res) => {
       res.send({
         login: false
       });
-    } else if ( await didUserCheck(tabName, questionNum, id) ) {
+    } else if (await didUserCheck(tabName, questionNum, id)) {
       res.send({
         login: true,
         didUserCheck: true
@@ -159,6 +159,23 @@ app.post('/sendAccount', (req, res) => {
 
 })
 
+let insertIdIntoDidUserCheck = (id) => {
+  let tabName = ['love', 'marriage'];
+  tabName.map((item) => {
+    sql = {
+      text: `insert into ${item}_did_user_check values ('${id}');`
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+        // console.log(DBRes.rows)
+      })
+      .catch((err) => {
+        // console.log(err)
+      })
+  })
+
+}
+
 //sign up
 app.post('/sendSignupInfo', (req, res) => {
   let id = req.body.id;
@@ -172,28 +189,26 @@ app.post('/sendSignupInfo', (req, res) => {
   }
   connection.query(sql)
     .then((DBRes) => {
-      // res.cookie('login', 'true', cookieConfig);
-      // res.cookie('id', id, cookieConfig);
-      // res.send(DBRes.rows);
-    })
-    .catch((err) => {
-      // res.send(err);
-    })
-
-  sql = {
-    text: 'insert into love_did_user_check values ($1);',
-    values: [id],
-  }
-  connection.query(sql)
-    .then((DBRes) => {
       res.cookie('login', 'true', cookieConfig);
       res.cookie('id', id, cookieConfig);
-      res.send(DBRes.rows);
+      res.send({
+        signup : true
+      });
+      insertIdIntoDidUserCheck(id);
     })
     .catch((err) => {
-      res.send(err);
+      res.cookie('login', 'false', cookieConfig);
+      if(err.code ==='23505'){
+        res.send({
+          signup : false,
+          code : '23505' 
+        })
+      }else{
+        res.send({
+          signup: false
+        })
+      }
     })
-
 })
 
 //when backend send response result to browser
@@ -221,9 +236,10 @@ app.post('/api/responseResult', (req, res) => {
 //logout
 app.get('/logout', (req, res) => {
   res.cookie('login', 'false', cookieConfig);
+  res.clearCookie('id');
   res.send();
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`leaf debate server listening on port ${port}`)
 })

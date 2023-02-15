@@ -34,32 +34,39 @@ function Signup() {
         setInputs(values => ({ ...values, [name]: value }))
     }
 
-   
+
 
     function sendSignupInfo() {
         let body = {
             id: inputs.id,
             password: inputs.password,
             gender: inputs.gender,
-            birthday : inputs.birthday
+            birthday: inputs.birthday
         }
 
         axios({
-            method:'post',
+            method: 'post',
             url: '/sendSignupInfo',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
-              },
-              data: body,
-              timeout: 5000
+            },
+            data: body,
+            timeout: 5000
         }).then(
-            (res)=>{
-                alert('your are signed up');
-                movePage('/MainPage');
+            (res) => {
+                if (res.data.signup === true) {
+                    alert('회원가입 되었습니다');
+                    movePage('/MainPage');
+                } else if (res.data.code === '23505') {
+                    alert('이미 사용중인 ID 입니다.');
+                } else {
+                    alert('회원가입 실패하였습니다다.');
+                }
             }
         ).catch(
-            ()=>{
-                alert('something wrong');
+            () => {
+                //logic have not been completed
+                alert('서버에 문제가 있습니다.');
             }
         )
 
