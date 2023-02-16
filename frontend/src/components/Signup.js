@@ -28,6 +28,34 @@ function Signup() {
         sendSignupInfo();
     }
 
+    const reqAuth = (event) => {
+        event.preventDefault();
+        let body = {
+            telNum: inputs.telNum
+        }
+
+        axios({
+            method: 'post',
+            url: '/reqAuth',
+            validateStatus: function (status) {
+                return status >= 200 && status < 300; // default
+            },
+            data: body,
+            timeout: 5000
+        }).then(
+            (res) => {
+                    alert('인증 요청하였습니다');
+            }
+        ).catch(
+            () => {
+                //logic have not been completed
+                alert('인증 요청 실패하였습니다.');
+            }
+        )
+
+
+    }
+
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -134,6 +162,21 @@ function Signup() {
                             onChange={handleChange}
                         />
                     </div>
+                    <div>
+                        <input
+                            type="text"
+                            name="telNum"
+                            onChange={handleChange}
+                            placeholder="- 빼고 숫자만 입력"
+                        />
+                        <button type="button" onClick={reqAuth}  >인증 요청</button>
+                    </div>
+                    <input className="loginInput"
+                        type="text"
+                        name="authNum"
+                        onChange={handleChange}
+                        placeholder="인증번호"
+                    />
                     <button className="login-btn" type="submit">Sign UP</button>
                 </form>
             </div>

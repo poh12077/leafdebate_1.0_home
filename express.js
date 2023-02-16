@@ -7,6 +7,8 @@ const fs = require('fs');
 const multer = require('multer')();
 const cookieParser = require('cookie-parser');
 const { response } = require('express');
+const CryptoJS = require("crypto-js");
+const axios = require("axios");
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,6 +42,15 @@ const cookieConfig = {
   maxAge: 1209600000,  // 14 days
   signed: true
 }
+
+const sens_service_id = 'ncp:sms:kr:302027453430:leaf_debate';
+const sens_access_key = 'gIjJNt01f2hjsIkzuKF5';
+const sens_secret_key = '5fYkh5mZPorEQnAjgnH1F2MRZPkgg2yxKee8Coeu';
+const sens_calling_number = '01094162506';  //calling number
+const sensSmsApiDomain = 'https://sens.apigw.ntruss.com';
+const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
+const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
+
 
 let updateDoesUserCheck = (res, tabName, questionNum, id) => {
 
@@ -192,23 +203,82 @@ app.post('/sendSignupInfo', (req, res) => {
       res.cookie('login', 'true', cookieConfig);
       res.cookie('id', id, cookieConfig);
       res.send({
-        signup : true
+        signup: true
       });
       insertIdIntoDidUserCheck(id);
     })
     .catch((err) => {
       res.cookie('login', 'false', cookieConfig);
-      if(err.code ==='23505'){
+      if (err.code === '23505') {
         res.send({
-          signup : false,
-          code : '23505' 
+          signup: false,
+          code: '23505'
         })
-      }else{
+      } else {
         res.send({
           signup: false
         })
       }
     })
+})
+
+
+let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
+  const space = " ";
+  const newLine = "\n";
+  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, sens_secret_key);
+
+  hmac.update(method);
+  hmac.update(space);
+  hmac.update(sensSmsApiPath);
+  hmac.update(newLine);
+  hmac.update(unixTime);
+  hmac.update(newLine);
+  hmac.update(sens_access_key);
+  const hash = hmac.finalize();
+  let signature = hash.toString(CryptoJS.enc.Base64);
+  return signature;
+}
+
+let callSensSmsApi = (method, sensSmsApiUrl, sens_access_key, unixTime, signature, sens_calling_number, countryCode, receivingNum, content) => {
+ return axios({
+    method: method,
+    url: sensSmsApiUrl,
+    validateStatus: function (status) {
+      return status >= 200 && status < 300; // default
+    },
+    headers: {
+      "Content-type": "application/json; charset=utf-8",
+      "x-ncp-iam-access-key": sens_access_key,
+      "x-ncp-apigw-timestamp": unixTime,
+      "x-ncp-apigw-signature-v2": signature,
+    },
+    data: {
+      type: "SMS",
+      contentType: "COMM",
+      countryCode: countryCode, //'82'
+      from: sens_calling_number,
+      content: content, //string
+      messages: [{ to: receivingNum }], //string
+    },
+  })
+}
+
+
+
+//authentication
+app.post('/reqAuth', (req, res) => {
+  const unixTime = Date.now().toString(); // Millisec
+  let receivingNum = req.body.telNum;
+  let content = 'hi';
+  let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
+  callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature, 
+  sens_calling_number, '82', receivingNum, content).then((sensRes)=>{
+    res.send();
+  }).catch((err)=>{
+    res.status(400);
+    res.send()
+  })
 })
 
 //when backend send response result to browser

@@ -17,3 +17,6 @@ ncp sms
 	한도 설정
 	선불인지 후불인지 
 sms 요청 제한하기 	
+status code 이해하고 응답 바디보다는 status code 활용하기
+axios catch
+cors
