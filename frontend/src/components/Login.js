@@ -117,6 +117,7 @@ function goToSignup() {
             // value={inputs.id || ""}
             onChange={handleChange}
             placeholder="ID"
+            maxlength="15"
           />
           <input className="loginInput"
             type="text"
@@ -124,6 +125,7 @@ function goToSignup() {
             // value={inputs.password || ""}
             onChange={handleChange}
             placeholder="password"
+            maxlength="15"
           />
           <button className="login-btn" type="submit">Login</button>
           <button className="login-btn" type="submit" onClick={goToSignup}>Sign Up</button>

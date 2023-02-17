@@ -1,0 +1,7 @@
+{
+ "sens_service_id" : "ncp:sms:kr:302027453430:leaf_debate",
+ "sens_access_key" : "gIjJNt01f2hjsIkzuKF5",
+ "sens_secret_key" : "5fYkh5mZPorEQnAjgnH1F2MRZPkgg2yxKee8Coeu",
+ "sens_calling_number" : "01094162506",  
+ "sensSmsApiDomain" : "https://sens.apigw.ntruss.com"
+}

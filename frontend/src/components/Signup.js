@@ -13,56 +13,25 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
-
 function Signup() {
     const [inputs, setInputs] = useState({});
 
     const movePage = useNavigate();
 
-    function goToMainPage() {
-        movePage('/MainPage');
+    let goToMainPage = ()=>{
+        movePage('/MainPage')
     }
-
+    
     const handleSubmit = (event) => {
         event.preventDefault();
         sendSignupInfo();
     }
-
-    const reqAuth = (event) => {
-        event.preventDefault();
-        let body = {
-            telNum: inputs.telNum
-        }
-
-        axios({
-            method: 'post',
-            url: '/reqAuth',
-            validateStatus: function (status) {
-                return status >= 200 && status < 300; // default
-            },
-            data: body,
-            timeout: 5000
-        }).then(
-            (res) => {
-                    alert('인증 요청하였습니다');
-            }
-        ).catch(
-            () => {
-                //logic have not been completed
-                alert('인증 요청 실패하였습니다.');
-            }
-        )
-
-
-    }
-
+   
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
         setInputs(values => ({ ...values, [name]: value }))
     }
-
-
 
     function sendSignupInfo() {
         let body = {
@@ -83,8 +52,8 @@ function Signup() {
         }).then(
             (res) => {
                 if (res.data.signup === true) {
-                    alert('회원가입 되었습니다');
-                    movePage('/MainPage');
+                    // alert('');
+                    movePage('/Auth');
                 } else if (res.data.code === '23505') {
                     alert('이미 사용중인 ID 입니다.');
                 } else {
@@ -97,9 +66,7 @@ function Signup() {
                 alert('서버에 문제가 있습니다.');
             }
         )
-
     }
-
 
     return (
         <div>
@@ -130,7 +97,8 @@ function Signup() {
                         name="id"
                         // value={inputs.id || ""}
                         onChange={handleChange}
-                        placeholder="ID"
+                        placeholder="아이디"
+                        maxlength="15"
                     />
                     <input className="loginInput"
                         type="text"
@@ -138,7 +106,8 @@ function Signup() {
                         name="password"
                         // value={inputs.password || ""}
                         onChange={handleChange}
-                        placeholder="password"
+                        placeholder="비밀번호"
+                        maxlength="15"
                     />
                     <input className="loginInput"
                         type="number" min="1900" max="2099" step="1"
@@ -146,43 +115,26 @@ function Signup() {
                         name="birthday"
                         // value={inputs.birthday || ""}
                         onChange={handleChange}
-                        placeholder="birthday ex)1993"
+                        placeholder="태어난 년도 ex)1993"
                     />
                     <div id="genderSignup" >
-                        male <input className="genderRadio"
+                        남자 <input className="genderRadio"
                             type="radio"
                             name="gender"
                             value="male"
                             onChange={handleChange}
                         />
-                        female <input className="genderRadio"
+                        여자 <input className="genderRadio"
                             type="radio"
                             name="gender"
                             value="female"
                             onChange={handleChange}
                         />
                     </div>
-                    <div>
-                        <input
-                            type="text"
-                            name="telNum"
-                            onChange={handleChange}
-                            placeholder="- 빼고 숫자만 입력"
-                        />
-                        <button type="button" onClick={reqAuth}  >인증 요청</button>
-                    </div>
-                    <input className="loginInput"
-                        type="text"
-                        name="authNum"
-                        onChange={handleChange}
-                        placeholder="인증번호"
-                    />
-                    <button className="login-btn" type="submit">Sign UP</button>
+                    <button className="login-btn" type="submit">다음</button>
                 </form>
             </div>
         </div>
-
-
     )
 }
 

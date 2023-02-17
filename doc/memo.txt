@@ -20,3 +20,5 @@ sms 요청 제한하기
 status code 이해하고 응답 바디보다는 status code 활용하기
 axios catch
 cors
+cookie 에 id 가 없는 경우 투표가 중복해서 되는 버그 
+front try catch is needed?

@@ -16,23 +16,26 @@ app.use(multer.array());
 const cookieSecretKey = 'dbstjrduf12#$';
 app.use(cookieParser(cookieSecretKey));
 
-const data = fs.readFileSync('./db.json');
-const conf = JSON.parse(data);
+let dbConf = fs.readFileSync('./dbConf.json');
+dbConf = JSON.parse(dbConf);
+
+let sensConf = fs.readFileSync('./sensConf.json');
+sensConf = JSON.parse(sensConf);
 
 // const connection = new pg.Client({
-//   user: conf.user,
-//   host: conf.host,
-//   database: conf.database,
-//   password: conf.password,
-//   port: conf.port
+//   user: dbConf.user,
+//   host: dbConf.host,
+//   database: dbConf.database,
+//   password: dbConf.password,
+//   port: dbConf.port
 // });
 
 const connection = new pg.Pool({
-  user: conf.user,
-  host: conf.host,
-  database: conf.database,
-  password: conf.password,
-  port: conf.port
+  user: dbConf.user,
+  host: dbConf.host,
+  database: dbConf.database,
+  password: dbConf.password,
+  port: dbConf.port
 });
 
 connection.connect();
@@ -43,13 +46,23 @@ const cookieConfig = {
   signed: true
 }
 
-const sens_service_id = 'ncp:sms:kr:302027453430:leaf_debate';
-const sens_access_key = 'gIjJNt01f2hjsIkzuKF5';
-const sens_secret_key = '5fYkh5mZPorEQnAjgnH1F2MRZPkgg2yxKee8Coeu';
-const sens_calling_number = '01094162506';  //calling number
-const sensSmsApiDomain = 'https://sens.apigw.ntruss.com';
+
+const sens_service_id = sensConf.sens_service_id;
+const sens_access_key = sensConf.sens_access_key;
+const sens_secret_key = sensConf.sens_secret_key;
+const sens_calling_number = sensConf.sens_calling_number;  //calling number
+const sensSmsApiDomain = sensConf.sensSmsApiDomain;
 const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
 const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
+
+
+// const sens_service_id = 'ncp:sms:kr:302027453430:leaf_debate';
+// const sens_access_key = 'gIjJNt01f2hjsIkzuKF5';
+// const sens_secret_key = '5fYkh5mZPorEQnAjgnH1F2MRZPkgg2yxKee8Coeu';
+// const sens_calling_number = '01094162506';  //calling number
+// const sensSmsApiDomain = 'https://sens.apigw.ntruss.com';
+// const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
+// const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 
 
 let updateDoesUserCheck = (res, tabName, questionNum, id) => {
@@ -184,7 +197,6 @@ let insertIdIntoDidUserCheck = (id) => {
         // console.log(err)
       })
   })
-
 }
 
 //sign up
@@ -264,21 +276,103 @@ let callSensSmsApi = (method, sensSmsApiUrl, sens_access_key, unixTime, signatur
   })
 }
 
+// min <= getRandomInteger(min,max) <= max
+function getRandomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
 
+function deleteAuthNum(telNum, validTime){
+  let sql = {
+    text: `delete from auth where tel_num = '${telNum}';`
+  }
+  setTimeout(() => {
+    connection.query(sql)
+    .then((DBRes) => {
+    })
+    .catch((err) => {
+    })
+  }, validTime);
+  
+}
+
+function updateAuthNum(telNum, authNum){
+  let sql = {
+    text: `update auth set auth_num = '${authNum}' where tel_num = '${telNum}';`
+  }
+  connection.query(sql)
+    .then((DBRes) => {
+      deleteAuthNum(telNum,180000);
+    })
+    .catch((err) => {
+    })
+}
+
+function insertAuthNum(telNum, authNum){
+  let sql = {
+    text: `insert into auth values ('${telNum}','${authNum}');`
+  }
+  connection.query(sql)
+    .then((DBRes) => {
+     deleteAuthNum(telNum,180000);
+    })
+    .catch((err) => {
+      if(err.code === '23505'){
+        updateAuthNum(telNum,authNum);
+      }else{
+
+      }
+    })
+}
+ 
+function getAuthNum(telNum){
+  let sql = {
+    text: `select auth_num from auth where tel_num='${telNum}';`
+  }
+  return connection.query(sql)
+    
+}
 
 //authentication
 app.post('/reqAuth', (req, res) => {
   const unixTime = Date.now().toString(); // Millisec
-  let receivingNum = req.body.telNum;
-  let content = 'hi';
+  let telNum = req.body.telNum;
+  const authNum = getRandomInteger(1000,9999).toString();
+  let content = `인증번호는 [${authNum}]입니다`;
   let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
   callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature, 
-  sens_calling_number, '82', receivingNum, content).then((sensRes)=>{
+  sens_calling_number, '82', telNum, content).then((sensRes)=>{
+    res.cookie('telNum', telNum, cookieConfig);
     res.send();
+    insertAuthNum(telNum, authNum);
   }).catch((err)=>{
     res.status(400);
     res.send()
   })
+})
+
+app.post('/sendAuthNum', async (req, res) => {
+try {
+  let telNum = req.signedCookies.telNum;
+  let authNumFromBrowser = req.body.authNum;
+  let dbRes = await getAuthNum(telNum);
+  if(dbRes.rows.length===0){
+    //vaild time of authNum is over
+    res.status(408);
+    res.send();
+  }else{
+    let origionalAuthNum = dbRes.rows[0].auth_num;
+    if(authNumFromBrowser===origionalAuthNum){
+      res.clearCookie('telNum');
+      res.send();
+    }else{
+      res.status(401);
+      res.send();
+    }
+  }
+} catch (error) {
+  console.log(error);
+}
+  
 })
 
 //when backend send response result to browser
