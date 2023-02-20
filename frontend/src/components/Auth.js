@@ -80,11 +80,16 @@ function Auth() {
             }
         ).catch(
             (err) => {
-                if(err.response.status==401){
-                    alert('인증 번호가 다릅니다.');
-                }else if(err.response.status==408){
-                    alert('입력 시간이 초과하였습니다.');
-                }else{
+                try {
+                    if(err.response.status==401){
+                        alert('인증 번호가 다릅니다.');
+                    }else if(err.response.status==408){
+                        alert('입력 시간이 초과하였습니다.');
+                    }else{
+                        alert('인증이 실패 하였니다.');
+                    }
+                } catch (error) {
+                    //server timeout
                     alert('인증이 실패 하였니다.');
                 }
             }

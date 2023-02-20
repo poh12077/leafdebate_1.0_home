@@ -46,7 +46,6 @@ const cookieConfig = {
   signed: true
 }
 
-
 const sens_service_id = sensConf.sens_service_id;
 const sens_access_key = sensConf.sens_access_key;
 const sens_secret_key = sensConf.sens_secret_key;
@@ -55,58 +54,44 @@ const sensSmsApiDomain = sensConf.sensSmsApiDomain;
 const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
 const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 
+let updateDidUserCheck = ( tabName, questionNum, id) => {
+  try {
+    let tableName = tabName + '_did_user_check';
+    sql = {
+      text: `UPDATE ${tableName} SET qn_${questionNum} = true WHERE id = '${id}';`
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+      })
+      .catch((err) => {
+      })
+  } catch (error) {
 
-// const sens_service_id = 'ncp:sms:kr:302027453430:leaf_debate';
-// const sens_access_key = 'gIjJNt01f2hjsIkzuKF5';
-// const sens_secret_key = '5fYkh5mZPorEQnAjgnH1F2MRZPkgg2yxKee8Coeu';
-// const sens_calling_number = '01094162506';  //calling number
-// const sensSmsApiDomain = 'https://sens.apigw.ntruss.com';
-// const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
-// const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
-
-
-let updateDoesUserCheck = (res, tabName, questionNum, id) => {
-
-  let tableName = tabName + '_did_user_check';
-  sql = {
-    text: `UPDATE ${tableName} SET qn_${questionNum} = true WHERE id = '${id}';`
   }
-  connection.query(sql)
-    .then((DBRes) => {
-      res.send({
-        login: true,
-        didUserCheck: false
-      });
-      console.log(DBRes);
-    })
-    .catch((err) => {
-      res.send(err);
-      console.log(err);
-    })
 }
 
 let didUserCheck = (tabName, questionNum, id) => {
-  return new Promise(
-    (resolve, reject) => {
-      let tableName = tabName + '_did_user_check';
-      let qn_num = 'qn_' + questionNum.toString();
-      sql = {
-        text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
+    return new Promise(
+      (resolve, reject) => {
+        let tableName = tabName + '_did_user_check';
+        let qn_num = 'qn_' + questionNum.toString();
+        sql = {
+          text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
+        }
+        connection.query(sql)
+          .then((DBRes) => {
+            if (DBRes.rows[0][qn_num]) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          })
+          .catch((err) => {
+            //there is no qn
+            reject(new Error(err));
+          })
       }
-      connection.query(sql)
-        .then((DBRes) => {
-          if (DBRes.rows[0][qn_num]) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          resolve(false);
-        })
-    }
-  )
+    )
 }
 
 //when user check option
@@ -121,32 +106,29 @@ app.post('/questionAnswer', async (req, res) => {
     tableName = tabName + gender + tableName;
     //check login 
     if (req.signedCookies.login === 'false') {
-      res.send({
-        login: false
-      });
+      res.status(401);
+      res.send();
     } else if (await didUserCheck(tabName, questionNum, id)) {
-      res.send({
-        login: true,
-        didUserCheck: true
-      })
+      res.status(400);
+      res.send();
     } else {
       let sql = {
         text: 'UPDATE ' + tableName + ' SET ' + checkedOption + ' = ' + checkedOption + ' +1 WHERE questionNum =$1;',
         values: [questionNum],
       }
       connection.query(sql)
-        .then((DBRes) => {
-          // res.send(DBRes.rows);
-          console.log(DBRes);
+        .then(() => {
+          res.send();
+          updateDidUserCheck(tabName, questionNum, id);
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          res.status(500);
+          res.send();
         })
-      updateDoesUserCheck(res, tabName, questionNum, id);
     }
   } catch (err) {
-    res.send(err);
-    console.log(err);
+    res.status(500);
+    res.send();
   }
 })
 
@@ -154,254 +136,364 @@ app.post('/questionAnswer', async (req, res) => {
 
 //login
 app.post('/sendAccount', (req, res) => {
-  let id = req.body.id;
-  let sql = {
-    text: 'SELECT password from userinfo where id = $1;',
-    values: [id],
-  }
-  connection.query(sql)
-    .then((DBRes) => {
-      if (req.body.password === DBRes.rows[0].password) {
-        //success
-        res.cookie('login', 'true', cookieConfig);
-        res.cookie('id', id, cookieConfig);
-        res.send();
-      } else {
-        //password wrong
+  try {
+
+    let id = req.body.id;
+    let sql = {
+      text: 'SELECT password from userinfo where id = $1;',
+      values: [id],
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+        if (req.body.password === DBRes.rows[0].password) {
+          //success
+          res.cookie('login', 'true', cookieConfig);
+          res.cookie('id', id, cookieConfig);
+          res.send();
+        } else {
+          //password wrong
+          res.statusCode = 401;
+          res.send('1');
+        }
+        // connection.end;
+      })
+      .catch((err) => {
+        //id wrong
+        console.log(err);
         res.statusCode = 401;
-        res.send('1');
-      }
-      // connection.end;
-    })
-    .catch((err) => {
-      //id wrong
-      console.log(err);
-      res.statusCode = 401;
-      res.send('2');
-      // connection.end;
-    })
+        res.send('2');
+        // connection.end;
+      })
+
+  } catch (error) {
+
+  }
 
 })
 
 let insertIdIntoDidUserCheck = (id) => {
-  let tabName = ['love', 'marriage'];
-  tabName.map((item) => {
-    sql = {
-      text: `insert into ${item}_did_user_check values ('${id}');`
-    }
-    connection.query(sql)
-      .then((DBRes) => {
-        // console.log(DBRes.rows)
-      })
-      .catch((err) => {
-        // console.log(err)
-      })
-  })
+  try {
+    let tabName = ['love', 'marriage'];
+    tabName.map((item) => {
+      sql = {
+        text: `insert into ${item}_did_user_check values ('${id}');`
+      }
+      connection.query(sql)
+        .then((DBRes) => {
+          // console.log(DBRes.rows)
+        })
+        .catch((err) => {
+          // console.log(err)
+        })
+    })
+
+  } catch (error) {
+
+  }
+
+
+
 }
 
-//sign up
-app.post('/sendSignupInfo', (req, res) => {
-  let id = req.body.id;
-  let password = req.body.password;
-  let gender = req.body.gender;
-  let birthday = req.body.birthday;
+// //previous sign up method 
+// app.post('/sendSignupInfo', (req, res) => {
+//   try {
+//     let id = req.body.id;
+//     let password = req.body.password;
+//     let gender = req.body.gender;
+//     let birthday = req.body.birthday;
 
-  let sql = {
-    text: 'insert into userinfo values ($1, $2, $3, $4)',
-    values: [id, password, gender, birthday],
+//     let sql = {
+//       text: 'insert into userinfo values ($1, $2, $3, $4)',
+//       values: [id, password, gender, birthday],
+//     }
+//     connection.query(sql)
+//       .then((DBRes) => {
+//         res.cookie('login', 'true', cookieConfig);
+//         res.cookie('id', id, cookieConfig);
+//         res.send({
+//           signup: true
+//         });
+//         insertIdIntoDidUserCheck(id);
+//       })
+//       .catch((err) => {
+//         res.cookie('login', 'false', cookieConfig);
+//         if (err.code === '23505') {
+//           res.send({
+//             signup: false,
+//             code: '23505'
+//           })
+//         } else {
+//           res.send({
+//             signup: false
+//           })
+//         }
+//       })
+//   } catch (error) {
+//   }
+// })
+
+
+//new sign up method 
+app.post('/sendSignupInfo', (req, res) => {
+  try {
+    let id = req.body.id;
+    let password = req.body.password;
+    let gender = req.body.gender;
+    let birthday = req.body.birthday;
+
+    let sql = {
+      text: `select * from userinfo where id='${id}'`
+    }
+    connection.query(sql)
+      .then((dbRes) => {
+        if(dbRes.rows.length===0){
+          //available id
+          res.cookie('id', id, cookieConfig);
+          res.cookie('password', password, cookieConfig);
+          res.cookie('gender', gender, cookieConfig);
+          res.cookie('birthday', birthday, cookieConfig);
+          res.send();
+        }else{
+          //unavailable id
+          res.status(400)
+          res.send();
+        }
+      }).catch(()=>{
+        //db error
+        res.status(500)
+        res.send();
+      })
+  } catch (error) {
   }
-  connection.query(sql)
-    .then((DBRes) => {
-      res.cookie('login', 'true', cookieConfig);
-      res.cookie('id', id, cookieConfig);
-      res.send({
-        signup: true
-      });
-      insertIdIntoDidUserCheck(id);
-    })
-    .catch((err) => {
-      res.cookie('login', 'false', cookieConfig);
-      if (err.code === '23505') {
-        res.send({
-          signup: false,
-          code: '23505'
-        })
-      } else {
-        res.send({
-          signup: false
-        })
-      }
-    })
 })
 
 
-let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
-  const space = " ";
-  const newLine = "\n";
-  const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, sens_secret_key);
 
-  hmac.update(method);
-  hmac.update(space);
-  hmac.update(sensSmsApiPath);
-  hmac.update(newLine);
-  hmac.update(unixTime);
-  hmac.update(newLine);
-  hmac.update(sens_access_key);
-  const hash = hmac.finalize();
-  let signature = hash.toString(CryptoJS.enc.Base64);
-  return signature;
+let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
+  try {
+
+    const space = " ";
+    const newLine = "\n";
+    const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, sens_secret_key);
+
+    hmac.update(method);
+    hmac.update(space);
+    hmac.update(sensSmsApiPath);
+    hmac.update(newLine);
+    hmac.update(unixTime);
+    hmac.update(newLine);
+    hmac.update(sens_access_key);
+    const hash = hmac.finalize();
+    let signature = hash.toString(CryptoJS.enc.Base64);
+    return signature;
+  } catch (error) {
+  }
 }
 
 let callSensSmsApi = (method, sensSmsApiUrl, sens_access_key, unixTime, signature, sens_calling_number, countryCode, receivingNum, content) => {
- return axios({
-    method: method,
-    url: sensSmsApiUrl,
-    validateStatus: function (status) {
-      return status >= 200 && status < 300; // default
-    },
-    headers: {
-      "Content-type": "application/json; charset=utf-8",
-      "x-ncp-iam-access-key": sens_access_key,
-      "x-ncp-apigw-timestamp": unixTime,
-      "x-ncp-apigw-signature-v2": signature,
-    },
-    data: {
-      type: "SMS",
-      contentType: "COMM",
-      countryCode: countryCode, //'82'
-      from: sens_calling_number,
-      content: content, //string
-      messages: [{ to: receivingNum }], //string
-    },
-  })
+  try {
+
+    return axios({
+      method: method,
+      url: sensSmsApiUrl,
+      validateStatus: function (status) {
+        return status >= 200 && status < 300; // default
+      },
+      headers: {
+        "Content-type": "application/json; charset=utf-8",
+        "x-ncp-iam-access-key": sens_access_key,
+        "x-ncp-apigw-timestamp": unixTime,
+        "x-ncp-apigw-signature-v2": signature,
+      },
+      data: {
+        type: "SMS",
+        contentType: "COMM",
+        countryCode: countryCode, //'82'
+        from: sens_calling_number,
+        content: content, //string
+        messages: [{ to: receivingNum }], //string
+      },
+    })
+  } catch (error) {
+  }
 }
 
 // min <= getRandomInteger(min,max) <= max
 function getRandomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) ) + min;
+  try {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  } catch (error) {
+  }
 }
 
-function deleteAuthNum(telNum, validTime){
-  let sql = {
-    text: `delete from auth where tel_num = '${telNum}';`
+function deleteAuthNum(telNum, validTime) {
+  try {
+    let sql = {
+      text: `delete from auth where tel_num = '${telNum}';`
+    }
+    setTimeout(() => {
+      connection.query(sql)
+        .then((DBRes) => {
+        })
+        .catch((err) => {
+        })
+    }, validTime);
+  } catch (error) {
   }
-  setTimeout(() => {
+}
+
+function updateAuthNum(telNum, authNum) {
+  try {
+    let sql = {
+      text: `update auth set auth_num = '${authNum}' where tel_num = '${telNum}';`
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+        deleteAuthNum(telNum, 180000);
+      })
+      .catch((err) => {
+      })
+  } catch (error) {
+  }
+}
+
+function insertAuthNum(telNum, authNum) {
+  try {
+    let sql = {
+      text: `insert into auth values ('${telNum}','${authNum}');`
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+        deleteAuthNum(telNum, 180000);
+      })
+      .catch((err) => {
+        if (err.code === '23505') {
+          updateAuthNum(telNum, authNum);
+        } else {
+        }
+      })
+  } catch (error) {
+  }
+}
+
+function getAuthNum(telNum) {
+  try {
+    let sql = {
+      text: `select auth_num from auth where tel_num='${telNum}';`
+    }
+    return connection.query(sql)
+  } catch (error) {
+  }
+}
+
+function insertSignup(id, password, gender, birthday) {
+  try {
+    let sql = {
+      text: `insert into userinfo values ('${id}','${password}','${gender}',${birthday})`
+    }
     connection.query(sql)
     .then((DBRes) => {
+      insertIdIntoDidUserCheck(id);
     })
     .catch((err) => {
     })
-  }, validTime);
-  
-}
-
-function updateAuthNum(telNum, authNum){
-  let sql = {
-    text: `update auth set auth_num = '${authNum}' where tel_num = '${telNum}';`
+  } catch (error) {
   }
-  connection.query(sql)
-    .then((DBRes) => {
-      deleteAuthNum(telNum,180000);
-    })
-    .catch((err) => {
-    })
-}
-
-function insertAuthNum(telNum, authNum){
-  let sql = {
-    text: `insert into auth values ('${telNum}','${authNum}');`
-  }
-  connection.query(sql)
-    .then((DBRes) => {
-     deleteAuthNum(telNum,180000);
-    })
-    .catch((err) => {
-      if(err.code === '23505'){
-        updateAuthNum(telNum,authNum);
-      }else{
-
-      }
-    })
-}
- 
-function getAuthNum(telNum){
-  let sql = {
-    text: `select auth_num from auth where tel_num='${telNum}';`
-  }
-  return connection.query(sql)
-    
 }
 
 //authentication
 app.post('/reqAuth', (req, res) => {
-  const unixTime = Date.now().toString(); // Millisec
-  let telNum = req.body.telNum;
-  const authNum = getRandomInteger(1000,9999).toString();
-  let content = `인증번호는 [${authNum}]입니다`;
-  let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
-  callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature, 
-  sens_calling_number, '82', telNum, content).then((sensRes)=>{
-    res.cookie('telNum', telNum, cookieConfig);
-    res.send();
-    insertAuthNum(telNum, authNum);
-  }).catch((err)=>{
-    res.status(400);
-    res.send()
-  })
+  try {
+    const unixTime = Date.now().toString(); // Millisec
+    let telNum = req.body.telNum;
+    const authNum = getRandomInteger(1000, 9999).toString();
+    let content = `인증번호는 [${authNum}]입니다`;
+    let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
+    callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+      sens_calling_number, '82', telNum, content).then((sensRes) => {
+        res.cookie('telNum', telNum, cookieConfig);
+        res.send();
+        insertAuthNum(telNum, authNum);
+      }).catch((err) => {
+        res.status(400);
+        res.send()
+      })
+  } catch (error) {
+  }
 })
 
 app.post('/sendAuthNum', async (req, res) => {
-try {
-  let telNum = req.signedCookies.telNum;
-  let authNumFromBrowser = req.body.authNum;
-  let dbRes = await getAuthNum(telNum);
-  if(dbRes.rows.length===0){
-    //vaild time of authNum is over
-    res.status(408);
-    res.send();
-  }else{
-    let origionalAuthNum = dbRes.rows[0].auth_num;
-    if(authNumFromBrowser===origionalAuthNum){
-      res.clearCookie('telNum');
+  try {
+    let telNum = req.signedCookies.telNum;
+    let authNumFromBrowser = req.body.authNum;
+    let dbRes = await getAuthNum(telNum);
+    if (dbRes.rows.length === 0) {
+      //vaild time of authNum is over
+      res.status(408);
       res.send();
-    }else{
-      res.status(401);
-      res.send();
+    } else {
+      let origionalAuthNum = dbRes.rows[0].auth_num;
+      if (authNumFromBrowser === origionalAuthNum) {
+         //signup success
+        let id = req.signedCookies.id;
+        let password = req.signedCookies.password;
+        let gender = req.signedCookies.gender;
+        let birthday = req.signedCookies.birthday;
+        res.cookie('login', 'true', cookieConfig);
+        res.clearCookie('password');
+        res.clearCookie('gender');
+        res.clearCookie('birthday');
+        res.clearCookie('telNum');
+        res.send();
+        insertSignup(id,password,gender,birthday);
+
+      } else {
+        //fail 
+        res.status(401);
+        res.send();
+      }
     }
+  } catch (error) {
+    console.log(error);
   }
-} catch (error) {
-  console.log(error);
-}
-  
+
 })
 
 //when backend send response result to browser
 app.post('/api/responseResult', (req, res) => {
-  let tableName = 'totalresponseresult';
-  let gender = req.body.gender;
-  let tabName = req.body.tabName;
-  tableName = tabName + gender + tableName;
+  try {
 
-  let sql = {
-    text: 'SELECT * from ' + tableName + ' where questionnum = $1;',
-    values: [req.body.questionNum],
+    let tableName = 'totalresponseresult';
+    let gender = req.body.gender;
+    let tabName = req.body.tabName;
+    tableName = tabName + gender + tableName;
+
+    let sql = {
+      text: 'SELECT * from ' + tableName + ' where questionnum = $1;',
+      values: [req.body.questionNum],
+    }
+
+    connection.query(sql)
+      .then((DBRes) => {
+        res.send(DBRes.rows);
+      })
+      .catch((err) => {
+
+      })
+  } catch (error) {
   }
-
-  connection.query(sql)
-    .then((DBRes) => {
-      res.send(DBRes.rows);
-    })
-    .catch((err) => {
-
-    })
-
 })
 
 //logout
 app.get('/logout', (req, res) => {
-  res.cookie('login', 'false', cookieConfig);
-  res.clearCookie('id');
-  res.send();
+  try {
+    res.cookie('login', 'false', cookieConfig);
+    res.clearCookie('id');
+    res.send();
+  } catch (error) {
+
+  }
 })
 
 app.listen(port, () => {

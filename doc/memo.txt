@@ -21,4 +21,7 @@ status code 이해하고 응답 바디보다는 status code 활용하기
 axios catch
 cors
 cookie 에 id 가 없는 경우 투표가 중복해서 되는 버그 
-front try catch is needed?
+회원가입 로직 수정
+전화번호 db에 넣어서 번호별로 계정 하나만 생성하도록 하기
+비밀번호랑 아이디 찾기 기능 만들기
+투표할수 있는 pie 그래프 만들기 

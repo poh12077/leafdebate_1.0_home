@@ -6,6 +6,7 @@ import RadarChart from "./RadarChart";
 import BarChart from "./BarChart";
 import Test from './Test';
 
+
 class Question extends React.Component {
 
   constructor(props) {
@@ -17,6 +18,9 @@ class Question extends React.Component {
       questionNum: 0
     }
   }
+
+
+ 
 
   handleChange = (e) => {
     if (e.target.checked) {
@@ -41,35 +45,38 @@ class Question extends React.Component {
       tabName: this.props.tabName
     }
 
-    axios({
-      method: 'post',
-      url: '/questionAnswer',
-      validateStatus: function (status) {
-        return status >= 200 && status < 300; // default
-      },
-      data: body,
-      timeout: 5000
-    }).then(
-      (res) => {
-        if (!res.data.login) {
-          console.log(typeof res.data.login);
-          // login have not been done
-          alert("you should login first");
-        }else if (res.data.didUserCheck){
-          //votiong was already done
-          alert("you cannot vote more than two times");
-        } else {
-          //voting is working 
-          alert("It's been voted")
-          this.child.current.stateRefresh();
-          // window.location.reload();
+      axios({
+        method: 'post',
+        url: '/questionAnswer',
+        validateStatus: function (status) {
+          return status >= 200 && status < 300; // default
+        },
+        data: body,
+        timeout: 5000
+      }).then(
+        (res) => {
+            //voting is working 
+            alert("투표 되었습니다")
+            this.child.current.stateRefresh();
+            // window.location.reload();
         }
-      }
-    ).catch(
-      () => {
-        console.log('no response from server');
-      }
-    )
+      ).catch(
+        (err) => {
+          try {
+            if(err.response.status==401){
+              alert('로그인을 먼저 해야 투표할수 있습니다');
+            }else if(err.response.status==400){
+              alert('두번 이상 투표할수 없습니다');
+            }else{
+              alert('서버에 문제가 있습니다');
+            }
+          } catch (error) {
+            //server timeout
+            alert('서버에 문제가 있습니다');
+          }
+        }
+      )
+
   }
 
   render() {

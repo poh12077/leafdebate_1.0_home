@@ -113,7 +113,9 @@ class BarChart extends React.Component {
           }
         )
       }
-    )
+    ).catch(()=>{
+      alert('서버에 문제가 있습니다');
+    })
     
   }
 
