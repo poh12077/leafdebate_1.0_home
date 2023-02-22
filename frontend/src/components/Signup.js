@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import '../css/login.css';
+import Auth from './Auth';
 
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
@@ -137,15 +138,16 @@ function Signup() {
                         onChange={handleChange}
                         placeholder="아이디"
                         maxlength="15"
+                        minlength="1"
                     />
                     <input className="loginInput"
-                        type="text"
-                        // type="password"
+                        type="password"
                         name="password"
                         // value={inputs.password || ""}
                         onChange={handleChange}
                         placeholder="비밀번호"
                         maxlength="15"
+                        minlength="1"
                     />
                     <input className="loginInput"
                         type="number" min="1900" max="2099" step="1"

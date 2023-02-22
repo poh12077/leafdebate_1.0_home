@@ -24,11 +24,8 @@ class App extends Component {
                   </Routes>
                 </BrowserRouter>
               </div>
-
         )
     }
-
-
 }
 
 export default App;

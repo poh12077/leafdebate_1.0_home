@@ -272,7 +272,6 @@ app.post('/sendSignupInfo', (req, res) => {
 
 let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
   try {
-
     const space = " ";
     const newLine = "\n";
     const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, sens_secret_key);
@@ -387,42 +386,84 @@ function getAuthNum(telNum) {
   }
 }
 
-function insertSignup(id, password, gender, birthday) {
-  try {
+function insertSignup(id, password, gender, birthday, telNum) {
+  return new Promise((resolve, reject)=>{
     let sql = {
-      text: `insert into userinfo values ('${id}','${password}','${gender}',${birthday})`
+      text: `insert into userinfo values ('${id}','${password}','${gender}',${birthday},'${telNum}')`
     }
     connection.query(sql)
     .then((DBRes) => {
       insertIdIntoDidUserCheck(id);
+      resolve(true);
     })
     .catch((err) => {
+      reject(new Error(err));
     })
-  } catch (error) {
-  }
+  })
+}
+
+function isTelNumAvaliable(telNum, tableName) {
+    return new Promise((resolve, reject)=>{
+      let sql = {
+        text: `select id from ${tableName} where tel_num= '${telNum}'`
+      }
+      connection.query(sql)
+      .then((dbRes) => {
+        if(dbRes.rows.length===0){
+          //valiable telNum
+          resolve(true);
+        }else{
+          //unavaliable telnum
+          resolve(false);
+        }
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+    })
 }
 
 //authentication
-app.post('/reqAuth', (req, res) => {
+app.post('/reqAuth', async (req, res) => {
   try {
     const unixTime = Date.now().toString(); // Millisec
     let telNum = req.body.telNum;
-    const authNum = getRandomInteger(1000, 9999).toString();
-    let content = `인증번호는 [${authNum}]입니다`;
-    let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
-    callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
-      sens_calling_number, '82', telNum, content).then((sensRes) => {
-        res.cookie('telNum', telNum, cookieConfig);
-        res.send();
-        insertAuthNum(telNum, authNum);
-      }).catch((err) => {
-        res.status(400);
-        res.send()
-      })
+    if(await isTelNumAvaliable(telNum, 'userinfo')){
+      const authNum = getRandomInteger(1000, 9999).toString();
+      let content = `인증번호는 [${authNum}]입니다`;
+      let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
+      callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+        sens_calling_number, '82', telNum, content).then((sensRes) => {
+          //sensSmsApi success
+          res.cookie('telNum', telNum, cookieConfig);
+          res.send();
+          insertAuthNum(telNum, authNum);
+        }).catch((err) => {
+          //sensSmsApi error
+          res.status(400);
+          res.send()
+        })
+
+        /*
+        //send sms to me 
+        callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+        sens_calling_number, '82', '01094162506', content).then((sensRes) => {
+        }).catch((err) => {
+        })
+        */
+    }else{
+      // unavailable telNum
+      res.status(401);
+      res.send();
+    }
   } catch (error) {
+    //server error
+    res.status(500);
+    res.send();
   }
 })
 
+//authentication
 app.post('/sendAuthNum', async (req, res) => {
   try {
     let telNum = req.signedCookies.telNum;
@@ -445,9 +486,10 @@ app.post('/sendAuthNum', async (req, res) => {
         res.clearCookie('gender');
         res.clearCookie('birthday');
         res.clearCookie('telNum');
-        res.send();
-        insertSignup(id,password,gender,birthday);
-
+        
+        if(await insertSignup(id,password,gender,birthday,telNum)){
+          res.send();
+        } 
       } else {
         //fail 
         res.status(401);
@@ -455,9 +497,9 @@ app.post('/sendAuthNum', async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    res.status(500);
+    res.send();    
   }
-
 })
 
 //when backend send response result to browser

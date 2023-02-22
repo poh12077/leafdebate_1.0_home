@@ -114,24 +114,22 @@ function goToSignup() {
           <input className="loginInput"
             type="text"
             name="id"
-            // value={inputs.id || ""}
             onChange={handleChange}
             placeholder="ID"
             maxlength="15"
+            minlength="1"
+            
           />
           <input className="loginInput"
-            type="text"
+            type="password"
             name="password"
-            // value={inputs.password || ""}
             onChange={handleChange}
             placeholder="password"
             maxlength="15"
+            minlength="1"
           />
           <button className="login-btn" type="submit">Login</button>
-          <button className="login-btn" type="submit" onClick={goToSignup}>Sign Up</button>
-          {/* <GoogleOauthLogin></GoogleOauthLogin>
-          <GoogleOauthLogout></GoogleOauthLogout> */}
-
+           <button className="login-btn" type="submit" onClick={goToSignup}>Sign Up</button>
         </form>
       </div>
 

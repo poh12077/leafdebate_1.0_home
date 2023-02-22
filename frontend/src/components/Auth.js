@@ -28,8 +28,14 @@ function Auth() {
         sendAuthNum();
     }
 
+    function disableBtn()  {
+        const target = document.getElementById('reqAuthBtn');
+        target.disabled = true;
+      }
+
     const reqAuth = (event) => {
         event.preventDefault();
+        disableBtn();
         let body = {
             telNum: inputs.telNum
         }
@@ -47,9 +53,16 @@ function Auth() {
                     alert('인증 요청하였습니다');
             }
         ).catch(
-            () => {
-                //logic have not been completed
-                alert('인증 요청 실패하였습니다.');
+            (err) => {
+                if(err.response.status==401){
+                    alert('이미 가입되어 있는 휴대폰 번호입니다.');
+                }else if(err.response.status==400){
+                    alert('sens sms api server error.');
+                }else if (err.response.status==500){
+                    alert('서버에 문제가 있습니다.');
+                }else{
+                    alert('서버에 문제가 있습니다.');
+                }
             }
         )
     }
@@ -84,7 +97,7 @@ function Auth() {
                     if(err.response.status==401){
                         alert('인증 번호가 다릅니다.');
                     }else if(err.response.status==408){
-                        alert('입력 시간이 초과하였습니다.');
+                        alert('전화번호를　잘못　입력하였거나　입력 시간이 초과하였습니다.');
                     }else{
                         alert('인증이 실패 하였니다.');
                     }
@@ -129,8 +142,9 @@ function Auth() {
                             onChange={handleChange}
                             placeholder="- 빼고 숫자만 입력"
                             maxlength="15"
+                            minlength="6"
                         />
-                        <button type="button" onClick={reqAuth}  >인증 요청</button>
+                        <button type="button" onClick={reqAuth} id="reqAuthBtn" >인증 요청</button>
                     </div>
                     <input className="loginInput"
                         type="text"
@@ -138,6 +152,7 @@ function Auth() {
                         onChange={handleChange}
                         placeholder="인증번호"
                         maxlength="10"
+                        minlength="3"
                     />
                     <button className="login-btn" type="submit">회원 가입</button>
                 </form>
