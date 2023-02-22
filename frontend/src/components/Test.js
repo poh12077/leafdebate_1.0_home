@@ -22,82 +22,26 @@ ChartJS.register(
   Legend
 );
 
-class Test extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      labels: [
-        'option1',
-        'option2',
-        'option3',
-        'option4',
-        'option5',
-        'option6'
-      ],
-      datasets: [{
-        label: 'woman',
-        data: [65, 20, 90, 81, 56, 55],
-        fill: true,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgb(255, 99, 132)',
-        pointBackgroundColor: 'rgb(255, 99, 132)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(255, 99, 132)'
-      }, {
-        label: 'man',
-        data: [50, 70, 50, 70, 50, 50],
-        fill: true,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgb(54, 162, 235)',
-        pointBackgroundColor: 'rgb(54, 162, 235)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(54, 162, 235)'
-      }]
+let CheckBoxOne = () => {
+  const checkOnlyOne = (checkThis) => {
+    const checkboxes = document.getElementsByClassName('test')
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i] !== checkThis) {
+        checkboxes[i].checked = false
+      }
     }
   }
-
- 
-  componentDidMount() {
-    let body = {
-      gender: 'male',
-      questionNum: this.props.questionNum
-    }
-    axios.post('/api/responseResult', body)
-      .then(
-        (res) => {
-          this.setState(
-            (prevStat) => {
-
-              let responseResult = [];
-              for (let key in res.data[0]) {
-                if (key !== 'questionnum') {
-                  responseResult.push(res.data[0][key]);
-                }
-              }
-
-              return {
-                datasets: prevStat.datasets.map(
-                  eli => {
-                    return {
-                      ...eli,
-                      data: responseResult
-                    }
-                  }
-                )
-              }
-            }
-          )
-        }
-      )
-  }
-
-
-  render() {
-    return <Radar data={this.state} />;
-  }
+  return (
+    <>
+      <input type="checkbox" class="test" value="1" onChange={(e) => checkOnlyOne(e.target)} /> 1
+      <br />
+      <input type="checkbox" class="test" value="2" onChange={(e) => checkOnlyOne(e.target)} /> 2
+      <br />
+      <input type="checkbox" class="test" value="3" onChange={(e) => checkOnlyOne(e.target)} /> 3
+      <br />
+    </>
+  )
 }
 
-export default Test;
+
+export default CheckBoxOne;

@@ -2,6 +2,8 @@
 jwt, web storage, session 
 -문항별 총 투표자수 표시
 -checkbox 
+	문항별 개수 다르게
+	탭별 checkonlyone 버그
 -질문 text 넣기 ( 데이터구조 만들기 ) 
 회원가입 예외처리
 	입력이 안된경우  (프론트 )
@@ -25,3 +27,5 @@ cookie 에 id 가 없는 경우 투표가 중복해서 되는 버그
 SignUP 에서 AUTH 로 넘어갈때 URL을 바꾸는지 않고 넘기는 방법  
 https
 domain
+-아이디 성별 별로 투표
+-그래프 y축 백분율

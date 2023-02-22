@@ -132,8 +132,6 @@ app.post('/questionAnswer', async (req, res) => {
   }
 })
 
-
-
 //login
 app.post('/sendAccount', (req, res) => {
   try {
@@ -164,11 +162,8 @@ app.post('/sendAccount', (req, res) => {
         res.send('2');
         // connection.end;
       })
-
   } catch (error) {
-
   }
-
 })
 
 let insertIdIntoDidUserCheck = (id) => {
@@ -186,53 +181,9 @@ let insertIdIntoDidUserCheck = (id) => {
           // console.log(err)
         })
     })
-
   } catch (error) {
-
   }
-
-
-
 }
-
-// //previous sign up method 
-// app.post('/sendSignupInfo', (req, res) => {
-//   try {
-//     let id = req.body.id;
-//     let password = req.body.password;
-//     let gender = req.body.gender;
-//     let birthday = req.body.birthday;
-
-//     let sql = {
-//       text: 'insert into userinfo values ($1, $2, $3, $4)',
-//       values: [id, password, gender, birthday],
-//     }
-//     connection.query(sql)
-//       .then((DBRes) => {
-//         res.cookie('login', 'true', cookieConfig);
-//         res.cookie('id', id, cookieConfig);
-//         res.send({
-//           signup: true
-//         });
-//         insertIdIntoDidUserCheck(id);
-//       })
-//       .catch((err) => {
-//         res.cookie('login', 'false', cookieConfig);
-//         if (err.code === '23505') {
-//           res.send({
-//             signup: false,
-//             code: '23505'
-//           })
-//         } else {
-//           res.send({
-//             signup: false
-//           })
-//         }
-//       })
-//   } catch (error) {
-//   }
-// })
-
 
 //new sign up method 
 app.post('/sendSignupInfo', (req, res) => {
@@ -267,8 +218,6 @@ app.post('/sendSignupInfo', (req, res) => {
   } catch (error) {
   }
 })
-
-
 
 let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
   try {

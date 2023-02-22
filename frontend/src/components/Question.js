@@ -19,14 +19,21 @@ class Question extends React.Component {
     }
   }
 
-
- 
-
   handleChange = (e) => {
     if (e.target.checked) {
       this.setState({
         checkedOption: e.target.value
       })
+    }
+    this.checkOnlyOne(e);
+  }
+
+  checkOnlyOne = (e) => {
+    const checkboxes = document.getElementsByClassName(e.target.className)
+    for (let i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i] !== e.target) {
+        checkboxes[i].checked = false
+      }
     }
   }
 
@@ -91,6 +98,7 @@ class Question extends React.Component {
                   <label>
                     <input
                       type="checkbox"
+                      className= {this.props.tabName+"Qn"+this.props.questionNum+"Checkboxs"}  
                       value={option.num}
                       onChange={this.handleChange}
                     /> {option.statement}
@@ -105,11 +113,8 @@ class Question extends React.Component {
           {/* <RadarChart questionNum={this.props.questionNum} ></RadarChart> */}
           <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} ></BarChart>
         </form>
-
       </div>
-
     )
-
   }
 }
 
