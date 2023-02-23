@@ -41,15 +41,16 @@ function goToSignup() {
     sendAccount().then(
       () => {
         movePage('/MainPage');
+        alert('로그인 되었습니다')
       }
     ).catch(
       (err) => {
         if (err.response.data == 1) {
-          alert('password wrong');
+          alert('비밀번호가 틀렸습니다');
         } else if (err.response.data == 2) {
-          alert('id wrong');
+          alert('아이디가 틀렸습니다');
         } else {
-          alert('server down');
+          alert('서버에 문제가 있습니다');
         }
       }
     );

@@ -26,12 +26,12 @@ class BarChart extends React.Component {
 
     this.state = {
       labels: [
-        'option1',
-        'option2',
-        'option3',
-        'option4',
-        'option5',
-        'option6'
+        '1번',
+        '2번',
+        '3번',
+        '4번',
+        '5번',
+        '6번'
       ],
       datasets: [
         {
@@ -90,7 +90,7 @@ class BarChart extends React.Component {
 
             let responseResult = [];
             for (let key in res.data[0]) {
-              if (key !== 'questionnum') {
+              if (key !== 'qn_num') {
                 responseResult.push(res.data[0][key]);
               }
             }

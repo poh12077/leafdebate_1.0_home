@@ -128,23 +128,22 @@ app.post('/questionAnswer', async (req, res) => {
     let questionNum = req.body.questionNum;
     let gender = await selectGender(id);
     let tabName = req.body.tabName;
-    let tableName = 'totalresponseresult';
-    tableName = tabName + gender + tableName;
+    let tableName = 'voting_result';
+    tableName = tabName+'_'+gender+'_'+tableName;
 
     if (await didUserCheck(tabName, questionNum, id)) {
       res.status(400);
       res.send();
     } else {
       let sql = {
-        text: 'UPDATE ' + tableName + ' SET ' + checkedOption + ' = ' + checkedOption + ' +1 WHERE questionNum =$1;',
-        values: [questionNum],
+        text: `UPDATE ${tableName} SET option_${checkedOption} = option_${checkedOption} +1 WHERE qn_num = ${questionNum};`
       }
       connection.query(sql)
         .then(() => {
           res.send();
           updateDidUserCheck(tabName, questionNum, id);
         })
-        .catch(() => {
+        .catch((err) => {
           res.status(500);
           res.send();
         })
@@ -477,15 +476,14 @@ app.post('/sendAuthNum', async (req, res) => {
 //when backend send response result to browser
 app.post('/api/responseResult', (req, res) => {
   try {
-
-    let tableName = 'totalresponseresult';
+    let tableName = 'voting_result';
     let gender = req.body.gender;
     let tabName = req.body.tabName;
-    tableName = tabName + gender + tableName;
+    let qnNum = req.body.questionNum;  
+    tableName = tabName+'_'+gender+'_'+tableName;
 
     let sql = {
-      text: 'SELECT * from ' + tableName + ' where questionnum = $1;',
-      values: [req.body.questionNum],
+      text: `SELECT * from ${tableName} where qn_num = ${qnNum};`
     }
 
     connection.query(sql)
@@ -493,9 +491,12 @@ app.post('/api/responseResult', (req, res) => {
         res.send(DBRes.rows);
       })
       .catch((err) => {
-
+        res.status(500);
+        res.send();
       })
   } catch (error) {
+      res.status(500);
+      res.send();
   }
 })
 

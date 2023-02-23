@@ -14,7 +14,7 @@ class Question extends React.Component {
     this.child = React.createRef();
     this.state = {
       options: this.props.options,
-      checkedOption: "",
+      checkedOption: 0,
       questionNum: 0
     }
   }
