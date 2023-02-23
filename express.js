@@ -57,7 +57,7 @@ const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 let updateDidUserCheck = ( tabName, questionNum, id) => {
   try {
     let tableName = tabName + '_did_user_check';
-    sql = {
+ let sql = {
       text: `UPDATE ${tableName} SET qn_${questionNum} = true WHERE id = '${id}';`
     }
     connection.query(sql)
@@ -75,7 +75,7 @@ let didUserCheck = (tabName, questionNum, id) => {
       (resolve, reject) => {
         let tableName = tabName + '_did_user_check';
         let qn_num = 'qn_' + questionNum.toString();
-        sql = {
+     let sql = {
           text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
         }
         connection.query(sql)
@@ -94,21 +94,44 @@ let didUserCheck = (tabName, questionNum, id) => {
     )
 }
 
+function selectGender(id){
+  return new Promise((resolve, reject)=>{
+    let sql = {
+      text: `select gender from userinfo WHERE id = '${id}';`
+    }
+    connection.query(sql)
+      .then((DBRes) => {
+        if (DBRes.rows.length===0) {
+          // there is no gender 
+          reject(new Error('there is no gender'));
+        } else {
+          resolve(DBRes.rows[0].gender)
+        }
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+  })
+}
+
+
 //when user check option
 app.post('/questionAnswer', async (req, res) => {
   try {
+    if (req.signedCookies.login === 'false') {
+    //check login 
+      res.status(401);
+      res.send();
+    }
     let id = req.signedCookies.id;
     let checkedOption = req.body.checkedOption;
     let questionNum = req.body.questionNum;
-    let gender = req.body.gender;
+    let gender = await selectGender(id);
     let tabName = req.body.tabName;
     let tableName = 'totalresponseresult';
     tableName = tabName + gender + tableName;
-    //check login 
-    if (req.signedCookies.login === 'false') {
-      res.status(401);
-      res.send();
-    } else if (await didUserCheck(tabName, questionNum, id)) {
+
+    if (await didUserCheck(tabName, questionNum, id)) {
       res.status(400);
       res.send();
     } else {
@@ -170,7 +193,7 @@ let insertIdIntoDidUserCheck = (id) => {
   try {
     let tabName = ['love', 'marriage'];
     tabName.map((item) => {
-      sql = {
+   let sql = {
         text: `insert into ${item}_did_user_check values ('${id}');`
       }
       connection.query(sql)

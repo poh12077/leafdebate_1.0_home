@@ -119,49 +119,6 @@ class BarChart extends React.Component {
     
   }
 
-  // callApi = (gender) => {
-  //   let body = {
-  //     gender: gender,
-  //     questionNum: this.props.questionNum,
-  //     tabName : this.props.tabName
-  //   }
-
-  //   axios.post('/api/responseResult', body)
-  //     .then(
-  //       (res) => {
-  //         this.setState(
-  //           (prevStat) => {
-
-  //             let responseResult = [];
-  //             for (let key in res.data[0]) {
-  //               if (key !== 'questionnum') {
-  //                 responseResult.push(res.data[0][key]);
-  //               }
-  //             }
-
-  //             return {
-  //               datasets: prevStat.datasets.map(
-  //                 eli => {
-  //                   if(eli.key===body.gender){
-  //                     return {
-  //                       ...eli,
-  //                       data: responseResult
-  //                     }
-  //                   }else{
-  //                     return eli;
-  //                   }
-                   
-  //                 }
-  //               )
-  //             }
-  //           }
-  //         )
-  //       }
-  //     )
-  // }
-
-
-
   componentDidMount() {
     this.callApi('male');
     this.callApi('female');

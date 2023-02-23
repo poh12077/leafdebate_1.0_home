@@ -1,6 +1,6 @@
 import '../style.css';
 import { useNavigate } from 'react-router-dom';
-import Tab from './Tab';
+import Tabs from './Tabs';
 import '../css/mainPage.css';
 
 import * as React from 'react';
@@ -68,7 +68,7 @@ let MainPage = () => {
                 </AppBar>
             </Box>
 
-            <Tab className='mainPage' ></Tab>
+            <Tabs className='mainPage' ></Tabs>
 
         </div>
     );

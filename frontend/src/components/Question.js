@@ -48,7 +48,6 @@ class Question extends React.Component {
     let body = {
       checkedOption: this.state.checkedOption,
       questionNum: this.state.questionNum,
-      gender: 'female',
       tabName: this.props.tabName
     }
 
@@ -91,7 +90,7 @@ class Question extends React.Component {
       <div className='question'>
         <form className="form" onSubmit={this.handleFormSubmit}>
           <fieldset className="fieldset" >
-            <legend>{this.props.questionNum + ". " + this.props.questionStatement}</legend>
+            <legend>{this.props.questionNum + ". " + this.props.qnStatement}</legend>
             {
               this.state.options.map(option => (
                 <div>

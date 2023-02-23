@@ -1,0 +1,54 @@
+{
+   "tabs":[
+        {
+            "tabName" : "love",
+            "qn":[
+                {
+                    "statement":"qn0",
+                    "options":[
+                        "op0",
+                        "op1"
+                    ]
+                },
+                {
+                    "statement":"qn1",
+                    "options":[
+                        "op0",
+                        "op1",
+                        "op2"
+                    ]
+                }
+            ]
+        },
+        {
+            "tabName" : "marriage",
+            "qn":[
+                {
+                    "statement":"qn00",
+                    "options":[
+                        "op0",
+                        "op1"
+                    ]
+                },
+                {
+                    "statement":"qn11",
+                    "options":[
+                        "op0",
+                        "op1",
+                        "op2"
+                    ]
+                },
+                {
+                    "statement":"qn22",
+                    "options":[
+                        "op0",
+                        "op1",
+                        "op2",
+                        "op3"
+                    ]
+                }
+            ]
+        }
+       
+    ]
+}
