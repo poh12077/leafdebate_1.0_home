@@ -103,14 +103,14 @@ function goToSignup() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              깻잎 논쟁
+              로그인
             </Typography>
             <Button color="inherit" onClick={goToMainPage} >MainPage</Button>
           </Toolbar>
         </AppBar>
       </Box>
       <div className="page">
-        <form className="cover" onSubmit={handleSubmit}>
+        <form className="loginCover" onSubmit={handleSubmit}>
           <h1>깻잎 논쟁</h1>
           <input className="loginInput"
             type="text"
@@ -129,13 +129,11 @@ function goToSignup() {
             maxlength="15"
             minlength="1"
           />
-          <button className="login-btn" type="submit">Login</button>
-           <button className="login-btn" type="submit" onClick={goToSignup}>Sign Up</button>
+          <button className="login-btn" type="submit">로그인</button>
+          <button className="login-btn" type="submit" onClick={goToSignup}>회원가입</button>
         </form>
       </div>
-
     </div>
-
   )
 }
 

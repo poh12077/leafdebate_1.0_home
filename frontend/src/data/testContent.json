@@ -1,0 +1,31 @@
+{
+   "tabs":[
+        {
+            "tabName" : "love",
+            "qn":[
+                {
+                    "statement":"애인이 내 친구 깻잎 떼주기 가능?",
+                    "options":[
+                        "1. 상관없음. 매너지",
+                        "2. 안돼",
+                        "3. 미쳤어? 헤어져"
+                    ]
+                }
+            ]
+        },
+        {
+            "tabName" : "marriage",
+            "qn":[
+                {
+                    "statement":"qn00",
+                    "options":[
+                        "op0",
+                        "op1"
+                    ]
+                }
+               
+            ]
+        }
+       
+    ]
+}

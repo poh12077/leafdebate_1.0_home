@@ -122,14 +122,14 @@ function Signup() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            깻잎논쟁
+                            회원가입
                         </Typography>
                         <Button color="inherit" onClick={goToMainPage} >mainPage</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
             <div className="page">
-                <form className="cover" onSubmit={handleSubmit}>
+                <form className="signupCover" onSubmit={handleSubmit}>
                     <h1>깻잎 논쟁</h1>
                     <input className="loginInput"
                         type="text"

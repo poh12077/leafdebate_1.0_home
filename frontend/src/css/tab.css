@@ -12,9 +12,11 @@
     max-width: 500px;
     height: 100%;
     background: #f1f1f1;
+    /* background-color: azure; */
     margin: 100px auto 0;
     word-break: break-all;
     border: 1px solid rgba(0, 0, 0, 0.274);
+    
   }
   
   .tabMenu {
@@ -38,7 +40,8 @@
   }
   
   .activeTab  {
-    background: white;
+    /* background: white; */
+    background-color: aliceblue;
     border-bottom: 1px solid transparent;
   }
   
@@ -61,7 +64,8 @@
   }
   
   .tabContent {
-    background: white;
+    /* background: white; */
+    background-color: aliceblue;
     padding: 20px;
     width: 100%;
     height: 100%;

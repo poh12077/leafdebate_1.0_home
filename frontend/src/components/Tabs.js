@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../css/tab.css";
 import Question from "./Question";
 import contentFile from "../data/content.json";
-
+// import contentFile from "../data/testContent.json";
 function Tabs() {
    
     function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement){

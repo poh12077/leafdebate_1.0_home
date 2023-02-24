@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import '../css/login.css';
+import '../css/auth.css';
 
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
@@ -125,26 +126,25 @@ function Auth() {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            깻잎논쟁
+                            회원가입
                         </Typography>
                         <Button color="inherit" onClick={goToMainPage} >mainPage</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
             <div className="page">
-                <form className="cover" onSubmit={handleSubmit}>
-                    <h1>깻잎 논쟁</h1>
-                    <p>인증 요청후 3분 이내에 인증하여야 합니다</p>
-                    <div>
-                        <input
+                <form className="authCover" onSubmit={handleSubmit}>
+                    <h2>핸드폰 문자 인증</h2>
+                    <div id="reqAuth">
+                        <input id="reqAuthInput"
                             type="text"
                             name="telNum"
                             onChange={handleChange}
-                            placeholder="- 빼고 숫자만 입력"
+                            placeholder="- 빼고 핸드폰번호 입력"
                             maxlength="15"
                             minlength="6"
                         />
-                        <button type="button" onClick={reqAuth} id="reqAuthBtn" >인증 요청</button>
+                        <button id="reqAuthBtn" type="button" onClick={reqAuth}>인증 요청</button>
                     </div>
                     <input className="loginInput"
                         type="text"

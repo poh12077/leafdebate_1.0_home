@@ -25,30 +25,22 @@ class BarChart extends React.Component {
     super(props);
 
     this.state = {
-      labels: [
-        '1번',
-        '2번',
-        '3번',
-        '4번',
-        '5번',
-        '6번'
-      ],
+      labels: [],
       datasets: [
         {
           key:'female',
-          label: 'woman',
+          label: '여자',
           data: null,
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
         {
           key:'male',
-          label: 'man',
+          label: '남자',
           data: null,
           backgroundColor: 'rgba(53, 162, 235, 0.5)',
         },
       ],
     }
-
   }
 
   options = {
@@ -87,7 +79,6 @@ class BarChart extends React.Component {
       (res) => {
         this.setState(
           (prevStat) => {
-
             let responseResult = [];
             for (let key in res.data[0]) {
               if (key !== 'qn_num') {
@@ -95,7 +86,13 @@ class BarChart extends React.Component {
               }
             }
 
+            let labels =[];
+            for(let i=0; i< this.props.numOfOptions; i++){
+              labels.push( (i+1).toString()+'번' );
+            }
+
             return {
+              labels: labels,
               datasets: prevStat.datasets.map(
                 eli => {
                   if(eli.key===body.gender){
@@ -106,7 +103,6 @@ class BarChart extends React.Component {
                   }else{
                     return eli;
                   }
-                 
                 }
               )
             }
@@ -116,7 +112,6 @@ class BarChart extends React.Component {
     ).catch(()=>{
       alert('서버에 문제가 있습니다');
     })
-    
   }
 
   componentDidMount() {
@@ -128,8 +123,6 @@ class BarChart extends React.Component {
     this.callApi('male');
     this.callApi('female');
   }
-
-
 
   render() {
     return <Bar options={this.options} data={this.state} />;

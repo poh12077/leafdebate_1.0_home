@@ -8,24 +8,28 @@
 /* --------------------------- MOBILE VERSION ------------------------------ */
 .page {
     height: 100vh;
+    /* height: 100%; */
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.75em;
+    /* background-color: aliceblue; */
 }
 
 #genderSignup{
     display: flex;
+    font-size: 0.8em;
 }
 
 .genderRadio{
-    margin: 10px;
+    /* margin: 10px; */
 }
-.cover {
+.signupCover {
     background-color: white;
     width: 70%;
-    height: 70%;
+    /* height: 100vh; */
+    height: 90%;
+    max-height: 500px;
     position: relative;
     border-radius: 1em;
     box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
@@ -33,18 +37,34 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
+    font-size: 1.5em;
+}
+
+.loginCover {
+    background-color: white;
+    width: 70%;
+    /* height: 100vh; */
+    height: 90%;
+    max-height: 400px;
+    position: relative;
+    border-radius: 1em;
+    box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 1.5em;
 }
 
 
 .loginInput {
-    border: none;
-    background-color: rgb(229, 226, 226);
+    border: 1px solid lightslategray;
     width: 80%;
-    height: 30px;
-    /* border-radius: 0.25em; */
+    height: 6vh;
+    border-radius: 0.5em;
     text-align: center;
     /* padding: 2em; */
-    /* font-size: 0.75em; */
+    font-size: 0.75em;
 }
 
 input:focus {
@@ -53,45 +73,55 @@ input:focus {
 
 .login-btn {
     width: 40%;
-    height: 3em;
+    height: 4vh;
     background-color: rgb(32, 177, 255);
     display: flex;
     justify-content: center;
     align-items: center;
     transition: 0.5s;
-    border-radius: 0.25em;
+    border-radius: 0.5em;
     cursor: pointer;
 }
 
 .login-btn:hover { transform: scale(1.25);}
 
-.text {
+/* .text {
     position: relative;
     bottom: 0.5%;
-}
+} */
 
 
 
 /* -------------------- TABLET OPTIMIZATION -------------------- */
 @media only screen and (min-device-width: 37em) {
     .page {
-        font-size: 1em;
+        font-size: 0.8em;
     }
 
-    .cover {
-        width: 60%;
-        height: 80%;
+    .loginCover {
+        width: 30%;
+        height: 65%;
+    }
+
+    .signupCover {
+        width: 30%;
+        height: 75%;
     }
 }
 
 /* -------------------- DESKTOP OPTIMIZATION -------------------- */
 @media only screen and (min-device-width: 64em) {
     .page {
-        font-size: 1.25em;
+        font-size: 0.7em;
     }
 
-    .cover {
+    .loginCover {
         width: 25%;
-        height: 80%;
+        height: 60%;
+    }
+
+    .signupCover {
+        width: 25%;
+        height: 70%;
     }
 }

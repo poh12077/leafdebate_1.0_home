@@ -26,6 +26,10 @@ let MainPage = () => {
         movePage('/Signup');
     }
 
+    function goToContact() {
+        movePage('/Contact');
+    }
+
     function logout(){
         axios({
             method: 'get',
@@ -49,7 +53,7 @@ let MainPage = () => {
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar>
-                        <IconButton
+                        {/* <IconButton
                             size="large"
                             edge="start"
                             color="inherit"
@@ -57,13 +61,14 @@ let MainPage = () => {
                             sx={{ mr: 2 }}
                         >
                             <MenuIcon />
-                        </IconButton>
+                        </IconButton> */}
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            깻잎 논쟁
+                            깻잎논쟁
                         </Typography>
                         <Button color="inherit" onClick={goToLogin} >Login</Button>
                         <Button color="inherit" onClick={goToSignup} >Sign-up</Button>
                         <Button color="inherit" onClick={logout} >Logout</Button>
+                        <Button color="inherit" onClick={goToContact} >Contact</Button>
                     </Toolbar>
                 </AppBar>
             </Box>

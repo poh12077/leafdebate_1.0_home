@@ -110,7 +110,7 @@ class Question extends React.Component {
             <button className="formButton" type="submit"  >adding</button>
           </fieldset>
           {/* <RadarChart questionNum={this.props.questionNum} ></RadarChart> */}
-          <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} ></BarChart>
+          <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} numOfOptions={this.state.options.length} ></BarChart>
         </form>
       </div>
     )
