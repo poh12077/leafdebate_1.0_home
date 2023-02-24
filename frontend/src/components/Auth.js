@@ -98,13 +98,13 @@ function Auth() {
                     if(err.response.status==401){
                         alert('인증 번호가 다릅니다.');
                     }else if(err.response.status==408){
-                        alert('전화번호를　잘못　입력하였거나　입력 시간이 초과하였습니다.');
+                        alert('전화번호를 잘못 입력하였거나 입력시간이 초과하였습니다.');
                     }else{
-                        alert('인증이 실패 하였니다.');
+                        alert('인증이 실패하였습니다.');
                     }
                 } catch (error) {
                     //server timeout
-                    alert('인증이 실패 하였니다.');
+                    alert('인증이 실패하였습니다.');
                 }
             }
         )
@@ -140,7 +140,7 @@ function Auth() {
                             type="text"
                             name="telNum"
                             onChange={handleChange}
-                            placeholder="- 빼고 핸드폰번호 입력"
+                            placeholder="핸드폰번호 입력(숫자만)"
                             maxlength="15"
                             minlength="6"
                         />
