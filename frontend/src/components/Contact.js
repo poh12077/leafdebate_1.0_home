@@ -1,6 +1,4 @@
-import '../style.css';
 import { useNavigate } from 'react-router-dom';
-import '../css/mainPage.css';
 import '../css/contact.css';
 
 import * as React from 'react';

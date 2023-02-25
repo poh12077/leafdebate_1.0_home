@@ -8,8 +8,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    width:85%;
-    max-width: 500px;
+    width:90%;
+    max-width: 600px;
     height: 100%;
     background: #f1f1f1;
     /* background-color: azure; */
@@ -34,6 +34,8 @@
     box-sizing: content-box;
     position: relative;
     outline: none;
+    font-size: 1.3em;
+    
   }
   .tab:not(:last-child){
     border-right: 1px solid rgba(0, 0, 0, 0.274);
@@ -66,7 +68,8 @@
   .tabContent {
     /* background: white; */
     background-color: aliceblue;
-    padding: 20px;
+    padding: 17px;
+    /* padding: 5vw; */
     width: 100%;
     height: 100%;
     display: none;

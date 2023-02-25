@@ -4,20 +4,20 @@ import Question from "./Question";
 import contentFile from "../data/content.json";
 // import contentFile from "../data/testContent.json";
 function Tabs() {
-   
-    function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement){
-        for(let i=0; i< content.tabs.length; i++){
+
+    function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement) {
+        for (let i = 0; i < content.tabs.length; i++) {
             tabNames.push(content.tabs[i].tabName);
             tabPages.push(i);
-            let qnList=[];
-            let statement=[];
-            let optionsInsingleTab=[];
-            for(let j=0; j<content.tabs[i].qn.length; j++){
+            let qnList = [];
+            let statement = [];
+            let optionsInsingleTab = [];
+            for (let j = 0; j < content.tabs[i].qn.length; j++) {
                 qnList.push(j);
-                statement.push(content.tabs[i].qn[j].statement); 
-                let optionsInsingleQn=[];
-                for(let k=0; k<content.tabs[i].qn[j].options.length; k++){
-                    optionsInsingleQn.push({num:k, statement: content.tabs[i].qn[j].options[k] });
+                statement.push(content.tabs[i].qn[j].statement);
+                let optionsInsingleQn = [];
+                for (let k = 0; k < content.tabs[i].qn[j].options.length; k++) {
+                    optionsInsingleQn.push({ num: k, statement: content.tabs[i].qn[j].options[k] });
                 }
                 optionsInsingleTab.push(optionsInsingleQn);
             }
@@ -30,11 +30,11 @@ function Tabs() {
     const [tabNum, setTabNum] = useState(0);
     const content = contentFile;
 
-    let qnStatement=[];
-    let tabSize=[];
+    let qnStatement = [];
+    let tabSize = [];
     let tabNames = [];
     let tabPages = [];
-    let optionStatement=[];
+    let optionStatement = [];
 
     parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement);
 
@@ -81,8 +81,26 @@ function Tab(props) {
 }
 
 function TabMenuButton(props) {
+
+    function translateTabName(tabName) {
+        switch (tabName) {
+            case 'love':
+                return '연애';
+            case 'marriage':
+                return "결혼";
+            case 'politics':
+                return "정치";
+            case 'work':
+                return '일';
+            case 'social_issue':
+                return '사회 이슈';
+            default:
+                return 'tab';
+        }
+    }
+
     return (
-        <button className={props.tabNum === props.clickedTabNum ? "tab activeTab" : "tab"} onClick={() => props.setTabNum(props.clickedTabNum)}> {props.tabName} </button>
+        <button className={props.tabNum === props.clickedTabNum ? "tab activeTab" : "tab"} onClick={() => props.setTabNum(props.clickedTabNum)}> {translateTabName(props.tabName)} </button>
     )
 }
 

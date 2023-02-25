@@ -30,6 +30,7 @@ sensConf = JSON.parse(sensConf);
 //   port: dbConf.port
 // });
 
+//db
 const connection = new pg.Pool({
   user: dbConf.user,
   host: dbConf.host,
@@ -46,6 +47,7 @@ const cookieConfig = {
   signed: true
 }
 
+//sens
 const sens_service_id = sensConf.sens_service_id;
 const sens_access_key = sensConf.sens_access_key;
 const sens_secret_key = sensConf.sens_secret_key;
@@ -53,6 +55,34 @@ const sens_calling_number = sensConf.sens_calling_number;  //calling number
 const sensSmsApiDomain = sensConf.sensSmsApiDomain;
 const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
 const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
+
+let contentFile = fs.readFileSync('./frontend/src/data/content.json');
+contentFile = JSON.parse(contentFile);
+let tabNames=[];
+parseContentFile(contentFile, tabNames);
+
+function parseContentFile(content, tabNames) {
+  for (let i = 0; i < content.tabs.length; i++) {
+      tabNames.push(content.tabs[i].tabName);
+      // tabPages.push(i);
+      // let qnList = [];
+      // let statement = [];
+      // let optionsInsingleTab = [];
+      // for (let j = 0; j < content.tabs[i].qn.length; j++) {
+      //     qnList.push(j);
+      //     statement.push(content.tabs[i].qn[j].statement);
+      //     let optionsInsingleQn = [];
+      //     for (let k = 0; k < content.tabs[i].qn[j].options.length; k++) {
+      //         optionsInsingleQn.push({ num: k, statement: content.tabs[i].qn[j].options[k] });
+      //     }
+      //     optionsInsingleTab.push(optionsInsingleQn);
+      // }
+      // tabSize.push(qnList);
+      // qnStatement.push(statement);
+      // optionStatement.push(optionsInsingleTab);
+  }
+}
+
 
 let updateDidUserCheck = ( tabName, questionNum, id) => {
   try {
@@ -190,8 +220,7 @@ app.post('/sendAccount', (req, res) => {
 
 let insertIdIntoDidUserCheck = (id) => {
   try {
-    let tabName = ['love', 'marriage'];
-    tabName.map((item) => {
+    tabNames.map((item) => {
    let sql = {
         text: `insert into ${item}_did_user_check values ('${id}');`
       }
@@ -415,13 +444,13 @@ app.post('/reqAuth', async (req, res) => {
           res.send()
         })
 
-        /*
+        
         //send sms to me 
         callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
         sens_calling_number, '82', '01094162506', content).then((sensRes) => {
         }).catch((err) => {
         })
-        */
+        
     }else{
       // unavailable telNum
       res.status(401);

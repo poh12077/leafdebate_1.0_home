@@ -29,7 +29,7 @@
     width: 70%;
     /* height: 100vh; */
     height: 90%;
-    max-height: 500px;
+    max-height: 400px;
     position: relative;
     border-radius: 1em;
     box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
@@ -105,7 +105,7 @@ input:focus {
 
     .signupCover {
         width: 30%;
-        height: 75%;
+        height: 65%;
     }
 }
 
@@ -122,6 +122,6 @@ input:focus {
 
     .signupCover {
         width: 25%;
-        height: 70%;
+        height: 60%;
     }
 }

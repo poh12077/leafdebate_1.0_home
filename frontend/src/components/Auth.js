@@ -140,7 +140,7 @@ function Auth() {
                             type="text"
                             name="telNum"
                             onChange={handleChange}
-                            placeholder="핸드폰번호 입력(숫자만)"
+                            placeholder="핸드폰번호 숫자만 입력"
                             maxlength="15"
                             minlength="6"
                         />

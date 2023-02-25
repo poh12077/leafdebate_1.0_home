@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import '../style.css';
+import '../css/question.css';
 import DoughnutChart from "./DoughnutChart";
 import RadarChart from "./RadarChart";
 import BarChart from "./BarChart";
@@ -107,7 +107,7 @@ class Question extends React.Component {
               ))
             }
             <br />
-            <button className="formButton" type="submit"  >adding</button>
+            <button className="formButton" type="submit" >투표</button>
           </fieldset>
           {/* <RadarChart questionNum={this.props.questionNum} ></RadarChart> */}
           <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} numOfOptions={this.state.options.length} ></BarChart>

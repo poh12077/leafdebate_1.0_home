@@ -1,4 +1,3 @@
-import '../style.css';
 import { useNavigate } from 'react-router-dom';
 import Tabs from './Tabs';
 import '../css/mainPage.css';

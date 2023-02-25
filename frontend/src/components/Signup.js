@@ -136,7 +136,7 @@ function Signup() {
                             onChange={handleChange}
                         />
                     </div>
-                    <button className="login-btn" type="submit">다음</button>
+                    <button className="login-btn" type="submit">가입</button>
                 </form>
             </div>
         </div>
