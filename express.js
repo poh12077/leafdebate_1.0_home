@@ -42,7 +42,7 @@ const connection = new pg.Pool({
 connection.connect();
 
 const cookieConfig = {
-  httpOnly: true,
+  httpOnly: false,
   maxAge: 1209600000,  // 14 days
   signed: true
 }
@@ -443,7 +443,6 @@ app.post('/reqAuth', async (req, res) => {
           res.status(400);
           res.send()
         })
-
         
         //send sms to me 
         callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,

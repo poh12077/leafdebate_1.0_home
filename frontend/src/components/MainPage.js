@@ -39,15 +39,66 @@ let MainPage = () => {
             timeout: 5000
           }).then(
             ()=>{
-                alert('you are logout');
+                alert('로그 아웃 되었습니다');
+                let target = document.getElementById('logoutBtn');
+                target.style.visibility='hidden';
+
+                target = document.getElementById('loginBtn');
+                target.style.visibility='visible';
+
+                target = document.getElementById('signupBtn');
+                target.style.visibility='visible';
             }
           ).catch(
           
           )
     }
 
-    return (
+    function checkLoginStatus(){
+        let cookie = document.cookie;
+        if(cookie.indexOf('login=')>-1){
+            // login cookie exist
+            let loginStatus = cookie.substring( cookie.indexOf('login=') + 10 ).charAt(0);
+            if(loginStatus==='t'){
+                return true
+            }else if (loginStatus ==='f'){
+                return false
+            }else{
+                return false
+            }
+        }else{
+            // login cookie doesn't exist
+            return false;
+        }
+       
+    }
 
+    function loginVisibility(boolean){
+        if(boolean){
+            return 'hidden'
+        }else{
+            return 'visible'
+        }
+    }
+
+    function signupVisibility(boolean){
+        if(boolean){
+            return 'hidden'
+        }else{
+            return 'visible'
+        }
+    }
+
+    function logoutVisibility(boolean){
+        if(boolean){
+            return 'visible'
+        }else{
+            return 'hidden'
+        }
+    }
+    
+  
+    return (
         <div  >
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
@@ -64,9 +115,9 @@ let MainPage = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎논쟁
                         </Typography>
-                        <Button color="inherit" onClick={goToLogin} >Login</Button>
-                        <Button color="inherit" onClick={goToSignup} >Sign-up</Button>
-                        <Button color="inherit" onClick={logout} >Logout</Button>
+                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ visibility : loginVisibility(checkLoginStatus())  }}  >로그인</Button>
+                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  visibility : signupVisibility(checkLoginStatus())  }} >회원가입</Button>
+                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ visibility : logoutVisibility(checkLoginStatus())  }}  >로그아웃</Button>
                         <Button color="inherit" onClick={goToContact} >Contact</Button>
                     </Toolbar>
                 </AppBar>
