@@ -15,7 +15,8 @@ class Question extends React.Component {
     this.state = {
       options: this.props.options,
       checkedOption: 0,
-      questionNum: 0
+      questionNum: 0,
+      qnType:""
     }
   }
 
@@ -40,7 +41,8 @@ class Question extends React.Component {
   handleFormSubmit = (e) => {
     e.preventDefault();
     this.setState({
-      questionNum: this.props.questionNum
+      questionNum: this.props.questionNum,
+      qnType: e.target[e.target.length-1].value  //qnType : formButton's value
     }, this.check)
   }
 
@@ -48,7 +50,8 @@ class Question extends React.Component {
     let body = {
       checkedOption: this.state.checkedOption,
       questionNum: this.state.questionNum,
-      tabName: this.props.tabName
+      tabName: this.props.tabName,
+      qnType : this.state.qnType
     }
 
       axios({
@@ -107,7 +110,7 @@ class Question extends React.Component {
               ))
             }
             <br />
-            <button className="formButton" type="submit" >투표</button>
+            <button className="formButton" type="submit" value={this.props.qnType} >제출</button>
           </fieldset>
           {/* <RadarChart questionNum={this.props.questionNum} ></RadarChart> */}
           <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} numOfOptions={this.state.options.length} ></BarChart>

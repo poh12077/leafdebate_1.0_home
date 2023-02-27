@@ -5,16 +5,18 @@ import contentFile from "../data/content.json";
 // import contentFile from "../data/testContent.json";
 function Tabs() {
 
-    function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement) {
+    function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement, qnTypes) {
         for (let i = 0; i < content.tabs.length; i++) {
             tabNames.push(content.tabs[i].tabName);
             tabPages.push(i);
             let qnList = [];
             let statement = [];
             let optionsInsingleTab = [];
+            let types=[];
             for (let j = 0; j < content.tabs[i].qn.length; j++) {
                 qnList.push(j);
                 statement.push(content.tabs[i].qn[j].statement);
+                types.push(content.tabs[i].qn[j].qnType);
                 let optionsInsingleQn = [];
                 for (let k = 0; k < content.tabs[i].qn[j].options.length; k++) {
                     optionsInsingleQn.push({ num: k, statement: content.tabs[i].qn[j].options[k] });
@@ -23,6 +25,7 @@ function Tabs() {
             }
             tabSize.push(qnList);
             qnStatement.push(statement);
+            qnTypes.push(types);
             optionStatement.push(optionsInsingleTab);
         }
     }
@@ -35,15 +38,9 @@ function Tabs() {
     let tabNames = [];
     let tabPages = [];
     let optionStatement = [];
+    let qnTypes=[];
 
-    parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement);
-
-    let options = [
-        { num: 'optionOne', statement: "option1" },
-        { num: 'optionTwo', statement: "option2" },
-        { num: 'optionThree', statement: "option3" },
-        { num: 'optionFour', statement: "option4" }
-    ];
+    parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement, qnTypes);
 
     return (
         <div className="tabContainer">
@@ -58,7 +55,7 @@ function Tabs() {
             <div className="tabContentWrapper">
                 {tabPages.map(
                     (tabPage) => {
-                        return <Tab tabNum={tabNum} clickedTabNum={tabPage} tabName={tabNames[tabPage]} optionsInsingleTab={optionStatement[tabPage]} qnList={tabSize[tabPage]} qnStatement={qnStatement[tabPage]} ></Tab>
+                        return <Tab tabNum={tabNum} clickedTabNum={tabPage} tabName={tabNames[tabPage]} optionsInsingleTab={optionStatement[tabPage]} qnList={tabSize[tabPage]} qnStatement={qnStatement[tabPage]} qnTypes={qnTypes[tabPage]} ></Tab>
                     }
                 )}
             </div>
@@ -72,7 +69,7 @@ function Tab(props) {
             {props.qnList.map(
                 (qnNum) =>
                     <div  >
-                        <Question key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} ></Question>
+                        <Question key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></Question>
                         <br /><br /><br />
                     </div>
             )}
