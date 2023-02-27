@@ -58,36 +58,52 @@ const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 
 let contentFile = fs.readFileSync('./frontend/src/data/content.json');
 contentFile = JSON.parse(contentFile);
-let tabNames=[];
-parseContentFile(contentFile, tabNames);
+let tabNames = [];
+let qnTypes = [];
 
-function parseContentFile(content, tabNames) {
-  for (let i = 0; i < content.tabs.length; i++) {
+parseContentFile(contentFile, tabNames, qnTypes, [], [], [], []);
+qnTypes = removeDuplication(qnTypes);
+
+function removeDuplication(array){
+  array = array[0];
+  let set = new Set(array);
+  return [...set];
+} 
+
+function parseContentFile(content, tabNames, qnTypes, qnStatement, tabSize, tabPages, optionStatement) {
+  try {
+    for (let i = 0; i < content.tabs.length; i++) {
       tabNames.push(content.tabs[i].tabName);
-      // tabPages.push(i);
-      // let qnList = [];
-      // let statement = [];
-      // let optionsInsingleTab = [];
-      // for (let j = 0; j < content.tabs[i].qn.length; j++) {
-      //     qnList.push(j);
-      //     statement.push(content.tabs[i].qn[j].statement);
-      //     let optionsInsingleQn = [];
-      //     for (let k = 0; k < content.tabs[i].qn[j].options.length; k++) {
-      //         optionsInsingleQn.push({ num: k, statement: content.tabs[i].qn[j].options[k] });
-      //     }
-      //     optionsInsingleTab.push(optionsInsingleQn);
-      // }
-      // tabSize.push(qnList);
-      // qnStatement.push(statement);
-      // optionStatement.push(optionsInsingleTab);
+      tabPages.push(i);
+      let qnList = [];
+      let statement = [];
+      let optionsInsingleTab = [];
+      let types = [];
+      for (let j = 0; j < content.tabs[i].qn.length; j++) {
+        qnList.push(j);
+        statement.push(content.tabs[i].qn[j].statement);
+        types.push(content.tabs[i].qn[j].qnType);
+        let optionsInsingleQn = [];
+        for (let k = 0; k < content.tabs[i].qn[j].options.length; k++) {
+          optionsInsingleQn.push({ num: k, statement: content.tabs[i].qn[j].options[k] });
+        }
+        optionsInsingleTab.push(optionsInsingleQn);
+      }
+      tabSize.push(qnList);
+      qnStatement.push(statement);
+      qnTypes.push(types);
+      optionStatement.push(optionsInsingleTab);
+    }
+  } catch (error) {
+    console.log(error);
+    process.exit();
   }
 }
 
-
-let updateDidUserCheck = ( tabName, questionNum, id) => {
+function updateDidUserCheck(tabName, questionNum, id) {
   try {
     let tableName = tabName + '_did_user_check';
- let sql = {
+    let sql = {
       text: `UPDATE ${tableName} SET qn_${questionNum} = true WHERE id = '${id}';`
     }
     connection.query(sql)
@@ -100,38 +116,38 @@ let updateDidUserCheck = ( tabName, questionNum, id) => {
   }
 }
 
-let didUserCheck = (tabName, questionNum, id) => {
-    return new Promise(
-      (resolve, reject) => {
-        let tableName = tabName + '_did_user_check';
-        let qn_num = 'qn_' + questionNum.toString();
-     let sql = {
-          text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
-        }
-        connection.query(sql)
-          .then((DBRes) => {
-            if (DBRes.rows[0][qn_num]) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          })
-          .catch((err) => {
-            //there is no qn
-            reject(new Error(err));
-          })
+function didUserCheck(tabName, questionNum, id) {
+  return new Promise(
+    (resolve, reject) => {
+      let tableName = tabName + '_did_user_check';
+      let qn_num = 'qn_' + questionNum.toString();
+      let sql = {
+        text: `select qn_${questionNum} from ${tableName} WHERE id = '${id}';`
       }
-    )
+      connection.query(sql)
+        .then((DBRes) => {
+          if (DBRes.rows[0][qn_num]) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch((err) => {
+          //there is no qn
+          reject(new Error(err));
+        })
+    }
+  )
 }
 
-function selectGender(id){
-  return new Promise((resolve, reject)=>{
+function selectGender(id) {
+  return new Promise((resolve, reject) => {
     let sql = {
       text: `select gender from userinfo WHERE id = '${id}';`
     }
     connection.query(sql)
       .then((DBRes) => {
-        if (DBRes.rows.length===0) {
+        if (DBRes.rows.length === 0) {
           // there is no gender 
           reject(new Error('there is no gender'));
         } else {
@@ -149,7 +165,7 @@ function selectGender(id){
 app.post('/questionAnswer', async (req, res) => {
   try {
     if (req.signedCookies.login === 'false') {
-    //check login 
+      //check login 
       res.status(401);
       res.send();
     }
@@ -159,7 +175,7 @@ app.post('/questionAnswer', async (req, res) => {
     let gender = await selectGender(id);
     let tabName = req.body.tabName;
     let tableName = 'voting_result';
-    tableName = tabName+'_'+gender+'_'+tableName;
+    tableName = tabName + '_' + gender + '_' + tableName;
 
     if (await didUserCheck(tabName, questionNum, id)) {
       res.status(400);
@@ -218,10 +234,10 @@ app.post('/sendAccount', (req, res) => {
   }
 })
 
-let insertIdIntoDidUserCheck = (id) => {
+function insertIdIntoDidUserCheck(id) {
   try {
     tabNames.map((item) => {
-   let sql = {
+      let sql = {
         text: `insert into ${item}_did_user_check values ('${id}');`
       }
       connection.query(sql)
@@ -236,6 +252,25 @@ let insertIdIntoDidUserCheck = (id) => {
   }
 }
 
+function insertIdIntoVotingResultByUser(id) {
+  return new Promise((resolve, reject)=>{
+    qnTypes.map((qnType) => {
+      let sql = {
+        text: `insert into love_${qnType}_voting_result_by_user values ('${id}');`
+      }
+      connection.query(sql)
+        .then((DBRes) => {
+          resolve();
+        })
+        .catch((err) => {
+          reject(new Error(err));
+        })
+    })
+  })
+  
+}
+
+
 //new sign up method 
 app.post('/sendSignupInfo', (req, res) => {
   try {
@@ -249,19 +284,19 @@ app.post('/sendSignupInfo', (req, res) => {
     }
     connection.query(sql)
       .then((dbRes) => {
-        if(dbRes.rows.length===0){
+        if (dbRes.rows.length === 0) {
           //available id
           res.cookie('id', id, cookieConfig);
           res.cookie('password', password, cookieConfig);
           res.cookie('gender', gender, cookieConfig);
           res.cookie('birthday', birthday, cookieConfig);
           res.send();
-        }else{
+        } else {
           //unavailable id
           res.status(400)
           res.send();
         }
-      }).catch(()=>{
+      }).catch(() => {
         //db error
         res.status(500)
         res.send();
@@ -270,7 +305,7 @@ app.post('/sendSignupInfo', (req, res) => {
   }
 })
 
-let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) => {
+function makeSignature(unixTime, method, sens_secret_key, sens_access_key, sensSmsApiPath) {
   try {
     const space = " ";
     const newLine = "\n";
@@ -290,7 +325,7 @@ let makeSignature = (unixTime, method, sens_secret_key, sens_access_key, sensSms
   }
 }
 
-let callSensSmsApi = (method, sensSmsApiUrl, sens_access_key, unixTime, signature, sens_calling_number, countryCode, receivingNum, content) => {
+function callSensSmsApi(method, sensSmsApiUrl, sens_access_key, unixTime, signature, sens_calling_number, countryCode, receivingNum, content) {
   try {
 
     return axios({
@@ -386,33 +421,34 @@ function getAuthNum(telNum) {
   }
 }
 
-function insertSignup(id, password, gender, birthday, telNum) {
-  return new Promise((resolve, reject)=>{
+ function insertSignup(id, password, gender, birthday, telNum) {
+  return new Promise((resolve, reject) => {
     let sql = {
       text: `insert into userinfo values ('${id}','${password}','${gender}',${birthday},'${telNum}')`
     }
     connection.query(sql)
-    .then((DBRes) => {
-      insertIdIntoDidUserCheck(id);
-      resolve(true);
-    })
-    .catch((err) => {
-      reject(new Error(err));
-    })
+      .then( async (DBRes) => {
+        insertIdIntoDidUserCheck(id);
+        await insertIdIntoVotingResultByUser(id);
+        resolve(true);
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
   })
 }
 
 function isTelNumAvaliable(telNum, tableName) {
-    return new Promise((resolve, reject)=>{
-      let sql = {
-        text: `select id from ${tableName} where tel_num= '${telNum}'`
-      }
-      connection.query(sql)
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `select id from ${tableName} where tel_num= '${telNum}'`
+    }
+    connection.query(sql)
       .then((dbRes) => {
-        if(dbRes.rows.length===0){
+        if (dbRes.rows.length === 0) {
           //valiable telNum
           resolve(true);
-        }else{
+        } else {
           //unavaliable telnum
           resolve(false);
         }
@@ -420,7 +456,7 @@ function isTelNumAvaliable(telNum, tableName) {
       .catch((err) => {
         reject(new Error(err));
       })
-    })
+  })
 }
 
 //authentication
@@ -428,7 +464,7 @@ app.post('/reqAuth', async (req, res) => {
   try {
     const unixTime = Date.now().toString(); // Millisec
     let telNum = req.body.telNum;
-    if(await isTelNumAvaliable(telNum, 'userinfo')){
+    if (await isTelNumAvaliable(telNum, 'userinfo')) {
       const authNum = getRandomInteger(1000, 9999).toString();
       let content = `인증번호는 [${authNum}]입니다`;
       let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
@@ -443,14 +479,14 @@ app.post('/reqAuth', async (req, res) => {
           res.status(400);
           res.send()
         })
-        
-        //send sms to me 
-        callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+
+      //send sms to me 
+      callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
         sens_calling_number, '82', '01094162506', content).then((sensRes) => {
         }).catch((err) => {
         })
-        
-    }else{
+
+    } else {
       // unavailable telNum
       res.status(401);
       res.send();
@@ -475,7 +511,7 @@ app.post('/sendAuthNum', async (req, res) => {
     } else {
       let origionalAuthNum = dbRes.rows[0].auth_num;
       if (authNumFromBrowser === origionalAuthNum) {
-         //signup success
+        //signup success
         let id = req.signedCookies.id;
         let password = req.signedCookies.password;
         let gender = req.signedCookies.gender;
@@ -485,10 +521,10 @@ app.post('/sendAuthNum', async (req, res) => {
         res.clearCookie('gender');
         res.clearCookie('birthday');
         res.clearCookie('telNum');
-        
-        if(await insertSignup(id,password,gender,birthday,telNum)){
+
+        if (await insertSignup(id, password, gender, birthday, telNum)) {
           res.send();
-        } 
+        }
       } else {
         //fail 
         res.status(401);
@@ -497,7 +533,7 @@ app.post('/sendAuthNum', async (req, res) => {
     }
   } catch (error) {
     res.status(500);
-    res.send();    
+    res.send();
   }
 })
 
@@ -507,8 +543,8 @@ app.post('/api/responseResult', (req, res) => {
     let tableName = 'voting_result';
     let gender = req.body.gender;
     let tabName = req.body.tabName;
-    let qnNum = req.body.questionNum;  
-    tableName = tabName+'_'+gender+'_'+tableName;
+    let qnNum = req.body.questionNum;
+    tableName = tabName + '_' + gender + '_' + tableName;
 
     let sql = {
       text: `SELECT * from ${tableName} where qn_num = ${qnNum};`
@@ -523,8 +559,8 @@ app.post('/api/responseResult', (req, res) => {
         res.send();
       })
   } catch (error) {
-      res.status(500);
-      res.send();
+    res.status(500);
+    res.send();
   }
 })
 
