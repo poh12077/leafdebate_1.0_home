@@ -96,6 +96,41 @@ let MainPage = () => {
             return 'hidden'
         }
     }
+
+    function reqType(){
+        let body = {
+          }
+      
+            axios({
+              method: 'post',
+              url: '/reqType',
+              validateStatus: function (status) {
+                return status >= 200 && status < 300; // default
+              },
+              data: body,
+              timeout: 5000
+            }).then(
+              (res) => {
+                  alert("투표 되었습니다")
+              }
+            ).catch(
+              (err) => {
+                try {
+                  if(err.response.status==401){
+                    alert('로그인을 먼저 해야 투표할수 있습니다');
+                  }else if(err.response.status==400){
+                    alert('두번 이상 투표할수 없습니다');
+                  }else{
+                    alert('서버에 문제가 있습니다');
+                  }
+                } catch (error) {
+                  //server timeout
+                  alert('서버에 문제가 있습니다');
+                }
+              }
+            )
+      
+    }
     
   
     return (
@@ -119,11 +154,13 @@ let MainPage = () => {
                         <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  visibility : signupVisibility(checkLoginStatus())  }} >회원가입</Button>
                         <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ visibility : logoutVisibility(checkLoginStatus())  }}  >로그아웃</Button>
                         <Button color="inherit" onClick={goToContact} >Contact</Button>
+                        {/* <Button color="inherit" onClick={reqType} >type</Button> */}
                     </Toolbar>
                 </AppBar>
             </Box>
 
             <Tabs className='mainPage' ></Tabs>
+            {/* <TypeTestTab></TypeTestTab> */}
 
         </div>
     );

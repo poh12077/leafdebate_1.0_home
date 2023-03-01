@@ -33,12 +33,20 @@ domain
 다중 선택 기능 
 log 찍기
 회원탈퇴
-mbti 처럼 연애 type 같은거 알려주기
-mbti web analysis
+
+type indicator algorithm
+	1. 조건
+		문제별 답안 개수 일정
+		문제별 가중치 없음
+
+	2. 알고리즘
+		테이블에서 값을 다 더한후 문제 개수로 나누어 평균값을 구한후 백분율로 표현
+		50을 기준으로 type 을 분류한다
+
 
 etc
 
 특허
-
+ncp cloud 공부
 
 

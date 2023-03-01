@@ -6,9 +6,10 @@ const pg = require("pg");
 const fs = require('fs');
 const multer = require('multer')();
 const cookieParser = require('cookie-parser');
-const { response } = require('express');
+const { response, json } = require('express');
 const CryptoJS = require("crypto-js");
 const axios = require("axios");
+const { resolve } = require('path');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,16 +60,11 @@ const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 let contentFile = fs.readFileSync('./frontend/src/data/content.json');
 contentFile = JSON.parse(contentFile);
 let tabNames = [];
-let qnTypes = [];
 
-parseContentFile(contentFile, tabNames, qnTypes, [], [], [], []);
-qnTypes = removeDuplication(qnTypes);
+parseContentFile(contentFile, tabNames, [], [], [], [], []);
 
-function removeDuplication(array){
-  array = array[0];
-  let set = new Set(array);
-  return [...set];
-} 
+let loveYhtiTypes = fs.readFileSync('./frontend/src/data/yhtiType.json');
+loveYhtiTypes = JSON.parse(loveYhtiTypes);
 
 function parseContentFile(content, tabNames, qnTypes, qnStatement, tabSize, tabPages, optionStatement) {
   try {
@@ -101,19 +97,19 @@ function parseContentFile(content, tabNames, qnTypes, qnStatement, tabSize, tabP
 }
 
 function updateDidUserCheck(tabName, questionNum, id) {
-  try {
+  return new Promise((resolve, reject) => {
     let tableName = tabName + '_did_user_check';
     let sql = {
       text: `UPDATE ${tableName} SET qn_${questionNum} = true WHERE id = '${id}';`
     }
     connection.query(sql)
       .then((DBRes) => {
+        resolve();
       })
       .catch((err) => {
+        reject(new Error(err));
       })
-  } catch (error) {
-
-  }
+  })
 }
 
 function didUserCheck(tabName, questionNum, id) {
@@ -160,6 +156,35 @@ function selectGender(id) {
   })
 }
 
+function updateVotingResultByUser(id, qnType, checkedOption, qnNum) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `UPDATE love_${qnType}_voting_result_by_user SET qn_${qnNum} = ${checkedOption} WHERE id = '${id}';`
+    }
+    connection.query(sql)
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+  })
+}
+
+function updateVotingResult(tabName, checkedOption, gender, questionNum) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `UPDATE ${tabName}_${gender}_voting_result SET option_${checkedOption} = option_${checkedOption} +1 WHERE qn_num = ${questionNum};`
+    }
+    connection.query(sql)
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+  })
+}
 
 //when user check option
 app.post('/questionAnswer', async (req, res) => {
@@ -174,6 +199,7 @@ app.post('/questionAnswer', async (req, res) => {
     let questionNum = req.body.questionNum;
     let gender = await selectGender(id);
     let tabName = req.body.tabName;
+    let qnType = req.body.qnType;
     let tableName = 'voting_result';
     tableName = tabName + '_' + gender + '_' + tableName;
 
@@ -181,18 +207,24 @@ app.post('/questionAnswer', async (req, res) => {
       res.status(400);
       res.send();
     } else {
-      let sql = {
-        text: `UPDATE ${tableName} SET option_${checkedOption} = option_${checkedOption} +1 WHERE qn_num = ${questionNum};`
-      }
-      connection.query(sql)
-        .then(() => {
-          res.send();
-          updateDidUserCheck(tabName, questionNum, id);
-        })
-        .catch((err) => {
+      if (qnType === "") {
+        //no qn type
+        updateVotingResult(tabName, checkedOption, gender, questionNum).catch(() => {
           res.status(500);
-          res.send();
         })
+        await updateDidUserCheck(tabName, questionNum, id)
+        res.send();
+      } else {
+        // there is qn type
+        updateVotingResult(tabName, checkedOption, gender, questionNum).catch(() => {
+          res.status(500);
+        })
+        updateDidUserCheck(tabName, questionNum, id).catch(() => {
+          res.status(500);
+        })
+        await updateVotingResultByUser(id, qnType, checkedOption, questionNum);
+        res.send();
+      }
     }
   } catch (err) {
     res.status(500);
@@ -235,28 +267,10 @@ app.post('/sendAccount', (req, res) => {
 })
 
 function insertIdIntoDidUserCheck(id) {
-  try {
+  return new Promise((resolve, reject) => {
     tabNames.map((item) => {
       let sql = {
         text: `insert into ${item}_did_user_check values ('${id}');`
-      }
-      connection.query(sql)
-        .then((DBRes) => {
-          // console.log(DBRes.rows)
-        })
-        .catch((err) => {
-          // console.log(err)
-        })
-    })
-  } catch (error) {
-  }
-}
-
-function insertIdIntoVotingResultByUser(id) {
-  return new Promise((resolve, reject)=>{
-    qnTypes.map((qnType) => {
-      let sql = {
-        text: `insert into love_${qnType}_voting_result_by_user values ('${id}');`
       }
       connection.query(sql)
         .then((DBRes) => {
@@ -267,8 +281,25 @@ function insertIdIntoVotingResultByUser(id) {
         })
     })
   })
-  
 }
+
+function insertIdIntoVotingResultByUser(id) {
+  return new Promise((resolve, reject) => {
+    for (let qnType in loveYhtiTypes) {
+      let sql = {
+        text: `insert into love_${qnType}_voting_result_by_user values ('${id}');`
+      }
+      connection.query(sql)
+        .then((DBRes) => {
+          resolve();
+        })
+        .catch((err) => {
+          reject(new Error(err));
+        })
+    }
+  })
+}
+
 
 
 //new sign up method 
@@ -421,13 +452,13 @@ function getAuthNum(telNum) {
   }
 }
 
- function insertSignup(id, password, gender, birthday, telNum) {
+function insertSignup(id, password, gender, birthday, telNum) {
   return new Promise((resolve, reject) => {
     let sql = {
       text: `insert into userinfo values ('${id}','${password}','${gender}',${birthday},'${telNum}')`
     }
     connection.query(sql)
-      .then( async (DBRes) => {
+      .then(async (DBRes) => {
         insertIdIntoDidUserCheck(id);
         await insertIdIntoVotingResultByUser(id);
         resolve(true);
@@ -481,10 +512,10 @@ app.post('/reqAuth', async (req, res) => {
         })
 
       //send sms to me 
-      callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
-        sens_calling_number, '82', '01094162506', content).then((sensRes) => {
-        }).catch((err) => {
-        })
+      // callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+      //   sens_calling_number, '82', '01094162506', content).then((sensRes) => {
+      //   }).catch((err) => {
+      //   })
 
     } else {
       // unavailable telNum
@@ -574,6 +605,82 @@ app.get('/logout', (req, res) => {
 
   }
 })
+
+function getScore(qnAnswers) {
+    if(qnAnswers===undefined){
+      throw new Error();
+    }
+    let sum = 0;
+    let numOfQn = 0;
+    for (let qnNum in qnAnswers) {
+      if (Number.isInteger(qnAnswers[qnNum])) {
+        sum += qnAnswers[qnNum];
+        numOfQn++;
+      }
+    }
+    if(numOfQn===0){
+      //there is no checked question
+      let err = new Error();
+      err.code=400;
+      throw err;
+    }
+    let score = (sum / (5 * numOfQn)) * 100;
+    return score;
+}
+
+function selectVotingResultByUser(qnType, yhtiArr, id) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `SELECT * from love_${qnType}_voting_result_by_user where id = '${id}';`
+    }
+
+    connection.query(sql)
+      .then((dbRes) => {
+        if (getScore(dbRes.rows[0]) < 50) {
+          yhtiArr.push(loveYhtiTypes[qnType][0])
+        } else {
+          yhtiArr.push(loveYhtiTypes[qnType][1])
+        }
+        resolve();
+      })
+      .catch((err) => {
+        reject(err);
+      })
+  })
+}
+
+app.post('/reqType', async (req, res) => {
+  try {
+    let id = req.signedCookies.id;
+    let yhtiArr = [];
+
+    for (let qnType in loveYhtiTypes) {
+      await selectVotingResultByUser(qnType, yhtiArr, id)
+    }
+
+    let yhtiStr = '';
+    for (let i = 0; i < yhtiArr.length; i++) {
+      yhtiStr += yhtiArr[i];
+    }
+
+    res.cookie('yhti', yhtiStr,{
+      httpOnly: false,
+      maxAge: 1209600000,  // 14 days
+      signed: false
+    });
+    res.send();
+  } catch (err) {
+    if(err.code==400){
+      res.status(400);
+      res.send();
+    }else{
+      res.status(500);
+    res.send();
+    }
+  }
+})
+
+
 
 app.listen(port, () => {
   console.log(`leaf debate server listening on port ${port}`)

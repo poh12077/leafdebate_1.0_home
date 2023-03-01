@@ -2,7 +2,11 @@ import { useState } from "react";
 import "../css/tab.css";
 import Question from "./Question";
 import contentFile from "../data/content.json";
+import TypeTestQn from "./TypeTestQn";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 // import contentFile from "../data/testContent.json";
+
 function Tabs() {
 
     function parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement, qnTypes) {
@@ -12,7 +16,7 @@ function Tabs() {
             let qnList = [];
             let statement = [];
             let optionsInsingleTab = [];
-            let types=[];
+            let types = [];
             for (let j = 0; j < content.tabs[i].qn.length; j++) {
                 qnList.push(j);
                 statement.push(content.tabs[i].qn[j].statement);
@@ -38,7 +42,7 @@ function Tabs() {
     let tabNames = [];
     let tabPages = [];
     let optionStatement = [];
-    let qnTypes=[];
+    let qnTypes = [];
 
     parseContentFile(content, qnStatement, tabSize, tabNames, tabPages, optionStatement, qnTypes);
 
@@ -63,16 +67,56 @@ function Tabs() {
     );
 }
 
+
 function Tab(props) {
+    const movePage = useNavigate();
+    function goToTypeResult() {
+        movePage('/TypeResult');
+    }
+
+    function reqType() {
+        let body = {
+        }
+        axios({
+            method: 'post',
+            url: '/reqType',
+            validateStatus: function (status) {
+                return status >= 200 && status < 300; // default
+            },
+            data: body,
+            timeout: 5000
+        }).then(
+            (res) => {
+                goToTypeResult();
+            }
+        ).catch(
+            (err) => {
+                try {
+                    if (err.response.status == 401) {
+                        alert('로그인을 먼저 해야 투표할수 있습니다');
+                    } else if (err.response.status == 400) {
+                        alert('제출하지 않은 문제가 있습니다');
+                    } else {
+                        alert('서버에 문제가 있습니다');
+                    }
+                } catch (error) {
+                    //server timeout
+                    alert('서버에 문제가 있습니다');
+                }
+            }
+        )
+    }
+
     return (
         <div className={props.tabNum === props.clickedTabNum ? "tabContent  activeTabcontent" : "tabContent"}   >
             {props.qnList.map(
                 (qnNum) =>
                     <div  >
-                        <Question key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></Question>
-                        <br /><br /><br />
+                        {/* <Question key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></Question> */}
+                        <TypeTestQn key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></TypeTestQn>
                     </div>
             )}
+            <button id="getTypeBtn" type="button" onClick={reqType}>TYPE 확인</button>
         </div>
     )
 }
