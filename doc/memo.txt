@@ -33,6 +33,7 @@ domain
 다중 선택 기능 
 log 찍기
 회원탈퇴
+제출 버튼 없애기
 
 type indicator algorithm
 	1. 조건

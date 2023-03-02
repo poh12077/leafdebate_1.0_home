@@ -52,9 +52,9 @@ let TypeResult = () => {
                 <h1 id='typeResultH1'>당신의 type 은 {getCookie('yhti')}입니다</h1>
                 <div id='typeResultDiscription' >
                     <div className='type'>
-                        <h3>사랑받기(<mark>T</mark>ake) vs 사랑하기(<mark>G</mark>ive)</h3>
-                        <p>사랑 받기 : 상대방을 사랑하는 것 보다 사랑 받는것이 중요한 타입</p>
-                        <p>사랑 하기 : 사랑 받는것 보다 사랑 하는것이 더 중요한 타입</p>
+                        <h3>받기(<mark>T</mark>ake) vs 주기(<mark>G</mark>ive)</h3>
+                        <p>받기 : 내가 상대방을 좋아하는것보다 상대방이 나를 좋아 하는것이 중요한 타입</p>
+                        <p>주기 : 상대방이 나를 좋아하는것보다 내가 상대방을 좋아하는것이 더 중요한 타입</p>
                     </div>
 
                     <div className='type'>
@@ -68,9 +68,9 @@ let TypeResult = () => {
                     </div>
 
                     <div className='type'>
-                        <h3>현재지향(at the <mark>M</mark>oment) vs 미래지향(<mark>F</mark>uture) </h3>
-                        <p>현재지향 : 현재 상대방이 좋으면 만난다</p>
-                        <p>미래지향 : 오래 함께할 수 있는 사람을 만난다</p>
+                        <h3>이성(<mark>R</mark>easonable) vs 공감(<mark>S</mark>ympathy) </h3>
+                        <p>이성 : 연인이 힘들다고 하면 해결책을 알려준다</p>
+                        <p>공감 : 연인이 힘들다고 하면 같이 아파 준다</p>
                     </div>
                 </div>
 

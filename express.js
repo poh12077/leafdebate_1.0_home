@@ -136,6 +136,27 @@ function didUserCheck(tabName, questionNum, id) {
   )
 }
 
+
+function selectTotalVotingResultByUser(tabName, questionNum, id) {
+  return new Promise(
+    (resolve, reject) => {
+      let qnNum = 'qn_' + questionNum.toString();
+      let sql = {
+        text: `select ${qnNum} from ${tabName}_total_voting_result_by_user where id = '${id}';`
+      }
+      connection.query(sql)
+        .then((dbRes) => {
+          resolve(dbRes.rows[0][qnNum])
+        })
+        .catch((err) => {
+          //there is no qn
+          reject(new Error(err));
+        })
+    }
+  )
+}
+
+
 function selectGender(id) {
   return new Promise((resolve, reject) => {
     let sql = {
@@ -156,10 +177,10 @@ function selectGender(id) {
   })
 }
 
-function updateVotingResultByUser(id, qnType, checkedOption, qnNum) {
+function updateVotingResultByUser(id, qnType, checkedOption, qnNum, tabName) {
   return new Promise((resolve, reject) => {
     let sql = {
-      text: `UPDATE love_${qnType}_voting_result_by_user SET qn_${qnNum} = ${checkedOption} WHERE id = '${id}';`
+      text: `UPDATE ${tabName}_${qnType}_voting_result_by_user SET qn_${qnNum} = ${checkedOption} WHERE id = '${id}';`
     }
     connection.query(sql)
       .then(() => {
@@ -171,10 +192,10 @@ function updateVotingResultByUser(id, qnType, checkedOption, qnNum) {
   })
 }
 
-function updateVotingResult(tabName, checkedOption, gender, questionNum) {
+function updateVotingResult(tabName, checkedOption, gender, questionNum, variable ) {
   return new Promise((resolve, reject) => {
     let sql = {
-      text: `UPDATE ${tabName}_${gender}_voting_result SET option_${checkedOption} = option_${checkedOption} +1 WHERE qn_num = ${questionNum};`
+      text: `UPDATE ${tabName}_${gender}_voting_result SET option_${checkedOption} = option_${checkedOption} + ${variable} WHERE qn_num = ${questionNum};`
     }
     connection.query(sql)
       .then(() => {
@@ -200,29 +221,49 @@ app.post('/questionAnswer', async (req, res) => {
     let gender = await selectGender(id);
     let tabName = req.body.tabName;
     let qnType = req.body.qnType;
-    let tableName = 'voting_result';
-    tableName = tabName + '_' + gender + '_' + tableName;
+    let previousUserAnswer = await selectTotalVotingResultByUser(tabName, questionNum, id);
 
-    if (await didUserCheck(tabName, questionNum, id)) {
-      res.status(400);
-      res.send();
-    } else {
-      if (qnType === "") {
-        //no qn type
-        updateVotingResult(tabName, checkedOption, gender, questionNum).catch(() => {
+    if (previousUserAnswer !== null ) {
+      //user have answered
+      if(checkedOption==previousUserAnswer){
+        //user checked same option with previous answer  
+        res.send();
+      }else{
+        //user checked different option with previous answer
+        updateVotingResult(tabName, previousUserAnswer, gender, questionNum, -1).catch(() => {
           res.status(500);
         })
-        await updateDidUserCheck(tabName, questionNum, id)
+        updateVotingResult(tabName, checkedOption, gender, questionNum, 1).catch(() => {
+          res.status(500);
+        })
+        if (qnType === "") {
+          //no qn type
+          await updateVotingResultByUser(id, 'total', checkedOption, questionNum, tabName);
+          res.send();
+        } else {
+          // there is qn type
+          updateVotingResultByUser(id, 'total', checkedOption, questionNum, tabName).catch(() => {
+            res.status(500);
+          })
+          await updateVotingResultByUser(id, qnType, checkedOption, questionNum, tabName);
+          res.send();
+        }
+      }
+    } else {
+      //user haven't answered 
+      updateVotingResult(tabName, checkedOption, gender, questionNum, 1).catch(() => {
+        res.status(500);
+      })
+      if (qnType === "") {
+        //no qn type
+        await updateVotingResultByUser(id, 'total', checkedOption, questionNum, tabName);
         res.send();
       } else {
         // there is qn type
-        updateVotingResult(tabName, checkedOption, gender, questionNum).catch(() => {
+        updateVotingResultByUser(id, 'total', checkedOption, questionNum, tabName).catch(() => {
           res.status(500);
         })
-        updateDidUserCheck(tabName, questionNum, id).catch(() => {
-          res.status(500);
-        })
-        await updateVotingResultByUser(id, qnType, checkedOption, questionNum);
+        await updateVotingResultByUser(id, qnType, checkedOption, questionNum, tabName);
         res.send();
       }
     }
@@ -300,7 +341,22 @@ function insertIdIntoVotingResultByUser(id) {
   })
 }
 
-
+function insertIdIntoTotalVotingResultByUser(id) {
+  return new Promise((resolve, reject) => {
+    tabNames.map((tabName)=>{
+      let sql = {
+        text: `insert into ${tabName}_total_voting_result_by_user values ('${id}');`
+      }
+      connection.query(sql)
+        .then((DBRes) => {
+          resolve();
+        })
+        .catch((err) => {
+          reject(new Error(err));
+        })
+    })
+  })
+}
 
 //new sign up method 
 app.post('/sendSignupInfo', (req, res) => {
@@ -459,8 +515,9 @@ function insertSignup(id, password, gender, birthday, telNum) {
     }
     connection.query(sql)
       .then(async (DBRes) => {
-        insertIdIntoDidUserCheck(id);
-        await insertIdIntoVotingResultByUser(id);
+        // insertIdIntoDidUserCheck(id);
+        insertIdIntoVotingResultByUser(id);
+        await insertIdIntoTotalVotingResultByUser(id);
         resolve(true);
       })
       .catch((err) => {
@@ -607,25 +664,25 @@ app.get('/logout', (req, res) => {
 })
 
 function getScore(qnAnswers) {
-    if(qnAnswers===undefined){
-      throw new Error();
+  if (qnAnswers === undefined) {
+    throw new Error();
+  }
+  let sum = 0;
+  let numOfQn = 0;
+  for (let qnNum in qnAnswers) {
+    if (Number.isInteger(qnAnswers[qnNum])) {
+      sum += qnAnswers[qnNum];
+      numOfQn++;
     }
-    let sum = 0;
-    let numOfQn = 0;
-    for (let qnNum in qnAnswers) {
-      if (Number.isInteger(qnAnswers[qnNum])) {
-        sum += qnAnswers[qnNum];
-        numOfQn++;
-      }
-    }
-    if(numOfQn===0){
-      //there is no checked question
-      let err = new Error();
-      err.code=400;
-      throw err;
-    }
-    let score = (sum / (5 * numOfQn)) * 100;
-    return score;
+  }
+  if (numOfQn === 0) {
+    //there is no checked question
+    let err = new Error();
+    err.code = 400;
+    throw err;
+  }
+  let score = (sum / (5 * numOfQn)) * 100;
+  return score;
 }
 
 function selectVotingResultByUser(qnType, yhtiArr, id) {
@@ -663,24 +720,22 @@ app.post('/reqType', async (req, res) => {
       yhtiStr += yhtiArr[i];
     }
 
-    res.cookie('yhti', yhtiStr,{
+    res.cookie('yhti', yhtiStr, {
       httpOnly: false,
       maxAge: 1209600000,  // 14 days
       signed: false
     });
     res.send();
   } catch (err) {
-    if(err.code==400){
+    if (err.code == 400) {
       res.status(400);
       res.send();
-    }else{
+    } else {
       res.status(500);
-    res.send();
+      res.send();
     }
   }
 })
-
-
 
 app.listen(port, () => {
   console.log(`leaf debate server listening on port ${port}`)

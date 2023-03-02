@@ -107,6 +107,14 @@ function Tab(props) {
         )
     }
 
+    function getTypeBtnVisibility(tabName){
+        if(tabName==='love'){
+            return 'visible'
+        }else{
+            return 'hidden'
+        }
+    }
+
     return (
         <div className={props.tabNum === props.clickedTabNum ? "tabContent  activeTabcontent" : "tabContent"}   >
             {props.qnList.map(
@@ -116,7 +124,7 @@ function Tab(props) {
                         <TypeTestQn key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></TypeTestQn>
                     </div>
             )}
-            <button id="getTypeBtn" type="button" onClick={reqType}>TYPE 확인</button>
+            <button id="getTypeBtn" type="button" onClick={reqType} style={{ visibility : getTypeBtnVisibility(props.tabName) }}  >TYPE 확인</button>
         </div>
     )
 }
