@@ -41,13 +41,13 @@ let MainPage = () => {
             ()=>{
                 alert('로그 아웃 되었습니다');
                 let target = document.getElementById('logoutBtn');
-                target.style.visibility='hidden';
+                target.style.display='none';
 
                 target = document.getElementById('loginBtn');
-                target.style.visibility='visible';
+                target.style.display='inline';
 
                 target = document.getElementById('signupBtn');
-                target.style.visibility='visible';
+                target.style.display='inline';
             }
           ).catch(
           
@@ -75,25 +75,25 @@ let MainPage = () => {
 
     function loginVisibility(boolean){
         if(boolean){
-            return 'hidden'
+            return 'none'
         }else{
-            return 'visible'
+            return 'inline'
         }
     }
 
     function signupVisibility(boolean){
         if(boolean){
-            return 'hidden'
+            return 'none'
         }else{
-            return 'visible'
+            return 'inline'
         }
     }
 
     function logoutVisibility(boolean){
         if(boolean){
-            return 'visible'
+            return 'inline'
         }else{
-            return 'hidden'
+            return 'none'
         }
     }
 
@@ -150,11 +150,10 @@ let MainPage = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎논쟁
                         </Typography>
-                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ visibility : loginVisibility(checkLoginStatus())  }}  >로그인</Button>
-                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  visibility : signupVisibility(checkLoginStatus())  }} >회원가입</Button>
-                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ visibility : logoutVisibility(checkLoginStatus())  }}  >로그아웃</Button>
+                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(checkLoginStatus())  }}  >로그인</Button>
+                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(checkLoginStatus())  }} >회원가입</Button>
+                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(checkLoginStatus())  }}  >로그아웃</Button>
                         <Button color="inherit" onClick={goToContact} >Contact</Button>
-                        {/* <Button color="inherit" onClick={reqType} >type</Button> */}
                     </Toolbar>
                 </AppBar>
             </Box>

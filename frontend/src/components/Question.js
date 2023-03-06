@@ -75,7 +75,7 @@ class Question extends React.Component {
             if(err.response.status==401){
               alert('로그인을 먼저 해야 투표할수 있습니다');
             }else if(err.response.status==400){
-              alert('두번 이상 투표할수 없습니다');
+              alert('');
             }else{
               alert('서버에 문제가 있습니다');
             }

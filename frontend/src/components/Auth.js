@@ -59,6 +59,8 @@ function Auth() {
                     alert('이미 가입되어 있는 휴대폰 번호입니다.');
                 }else if(err.response.status==400){
                     alert('sens sms api server error.');
+                }else if(err.response.status==429){
+                    alert('3분 이후에 다시 요청하시기 바랍니다')
                 }else if (err.response.status==500){
                     alert('서버에 문제가 있습니다.');
                 }else{

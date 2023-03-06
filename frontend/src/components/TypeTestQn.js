@@ -22,11 +22,13 @@ class TypeTestQn extends React.Component {
 
   handleChange = (e) => {
     if (e.target.checked) {
+      this.checkOnlyOne(e);
       this.setState({
-        checkedOption: e.target.value
-      })
+        checkedOption: e.target.value,
+        questionNum: this.props.questionNum,
+        qnType: e.target.form[e.target.form.length-1].value  //qnType : formButton's value
+      }, this.check)
     }
-    this.checkOnlyOne(e);
   }
 
   checkOnlyOne = (e) => {
@@ -75,7 +77,7 @@ class TypeTestQn extends React.Component {
             if(err.response.status==401){
               alert('로그인을 먼저 해야 투표할수 있습니다');
             }else if(err.response.status==400){
-              alert('두번 이상 투표할수 없습니다');
+              alert('');
             }else{
               alert('서버에 문제가 있습니다');
             }
@@ -93,7 +95,7 @@ class TypeTestQn extends React.Component {
         <form className="form" onSubmit={this.handleFormSubmit}>
           <div className="qn" >
             <legend>{this.props.questionNum + ". " + this.props.qnStatement}</legend>
-            <label className="consentLabel" >동의</label>
+            <label className="consentLabel" >비동의</label>
             {
               this.state.options.map(option => (
                   <label>
@@ -112,9 +114,9 @@ class TypeTestQn extends React.Component {
                   </label>
               ))
             }
-            <label className="consentLabel"  >비동의</label>
+            <label className="consentLabel"  >동의</label>
             <br></br>
-            <button className="formButton" type="submit" value={this.props.qnType} >제출</button>
+            <button className="formButton" type="submit" value={this.props.qnType} style={{display:"none"}} >제출</button>
           </div>
           <BarChart questionNum={this.props.questionNum} ref={this.child} tabName={this.props.tabName} numOfOptions={this.state.options.length} ></BarChart>
         </form>

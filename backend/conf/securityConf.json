@@ -1,0 +1,8 @@
+{
+    "ddos":{
+        "windowMs" : 180000,
+        "max":30,
+        "standardHeaders": false,
+        "legacyHeaders" : false
+    }
+}

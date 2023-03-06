@@ -9,7 +9,19 @@ const cookieParser = require('cookie-parser');
 const { response, json } = require('express');
 const CryptoJS = require("crypto-js");
 const axios = require("axios");
-const { resolve } = require('path');
+const rateLimit = require("express-rate-limit");
+const path = require('path');
+
+let securityConf = fs.readFileSync( path.resolve(__dirname, './conf/securityConf.json') );
+securityConf = JSON.parse(securityConf);
+
+//sens ddos security configure
+const limiter = rateLimit({
+  windowMs: securityConf.ddos.windowMs, // milli second
+  max: securityConf.ddos.max, // Limit each IP to x requests per `window` 
+  standardHeaders: securityConf.ddos.standardHeaders, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: securityConf.ddos.legacyHeaders,
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,10 +29,10 @@ app.use(multer.array());
 const cookieSecretKey = 'dbstjrduf12#$';
 app.use(cookieParser(cookieSecretKey));
 
-let dbConf = fs.readFileSync('./dbConf.json');
+let dbConf = fs.readFileSync( path.resolve(__dirname, './conf/dbConf.json')  );
 dbConf = JSON.parse(dbConf);
 
-let sensConf = fs.readFileSync('./sensConf.json');
+let sensConf = fs.readFileSync( path.resolve(__dirname, './conf/sensConf.json') );
 sensConf = JSON.parse(sensConf);
 
 // const connection = new pg.Client({
@@ -57,13 +69,13 @@ const sensSmsApiDomain = sensConf.sensSmsApiDomain;
 const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
 const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 
-let contentFile = fs.readFileSync('./frontend/src/data/content.json');
+let contentFile = fs.readFileSync( path.resolve(__dirname, '../frontend/src/data/content.json' ) );
 contentFile = JSON.parse(contentFile);
 let tabNames = [];
 
 parseContentFile(contentFile, tabNames, [], [], [], [], []);
 
-let loveYhtiTypes = fs.readFileSync('./frontend/src/data/yhtiType.json');
+let loveYhtiTypes = fs.readFileSync( path.resolve(__dirname, '../frontend/src/data/yhtiType.json') );
 loveYhtiTypes = JSON.parse(loveYhtiTypes);
 
 function parseContentFile(content, tabNames, qnTypes, qnStatement, tabSize, tabPages, optionStatement) {
@@ -548,7 +560,7 @@ function isTelNumAvaliable(telNum, tableName) {
 }
 
 //authentication
-app.post('/reqAuth', async (req, res) => {
+app.post('/reqAuth', limiter, async (req, res) => {
   try {
     const unixTime = Date.now().toString(); // Millisec
     let telNum = req.body.telNum;
