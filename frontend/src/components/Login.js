@@ -34,6 +34,10 @@ function goToSignup() {
   movePage('/Signup');
 }
 
+function goToFindId() {
+  movePage('/FindId');
+}
+
 
 
   const handleSubmit = (event) => {
@@ -119,7 +123,6 @@ function goToSignup() {
             placeholder="ID"
             maxlength="15"
             minlength="1"
-            
           />
           <input className="loginInput"
             type="password"
@@ -131,6 +134,7 @@ function goToSignup() {
           />
           <button className="login-btn" type="submit">로그인</button>
           <button className="login-btn" type="submit" onClick={goToSignup}>회원가입</button>
+          <button className="login-btn" type="submit" onClick={goToFindId}>아이디 찾기</button>
         </form>
       </div>
     </div>

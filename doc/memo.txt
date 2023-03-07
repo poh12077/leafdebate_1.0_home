@@ -17,11 +17,9 @@ sms 요청 제한하기
 	mac address (npm install node-macaddress) 로 차단
 	-국외발신 제한하기
 cookie 에 id 가 없는 경우 투표가 중복해서 되는 버그 
--비밀번호랑 아이디 찾기 기능 만들기
-데이터베이스에 있는 전화번호 암호화
+
 의도적으로 바로 http://localhost:3000/auth 로 접속하는 경우
 SignUP 에서 AUTH 로 넘어갈때 URL을 바꾸는지 않고 넘기는 방법  
-https
 domain
 그래프 y축 백분율    
 다중 선택 기능 
@@ -29,6 +27,11 @@ log 찍기
 회원탈퇴
 -계정별로 투표했던 결과 프론트에 남기기
 
+
+security weakness 
+쿠키사용
+http
+데이터베이스에 전화번호 해싱 하지 않고 저장 
 
 type indicator algorithm
 	1. 조건

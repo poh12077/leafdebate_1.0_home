@@ -87,7 +87,57 @@ class TypeTestQn extends React.Component {
           }
         }
       )
+  }
 
+  getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+  // componentDidMount() {
+  //   if(this.getCookie('login')){
+  //     if(n===0){
+  //       this.checkPreviosAnswer();
+  //       n++;
+  //     }
+
+  //   }else{
+
+  //   }
+
+  // }
+
+
+  checkPreviosAnswer(){
+    let body = {
+      tabName: this.props.tabName
+    }
+
+      axios({
+        method: 'post',
+        url: '/getPreviosAnswer',
+        validateStatus: function (status) {
+          return status >= 200 && status < 300; // default
+        },
+        data: body,
+        timeout: 5000
+      }).then(
+        (res) => {
+          let previousAnswer = res.data;
+          for (let qnNum in previousAnswer) {
+            if(qnNum!=='id' && previousAnswer[qnNum]!==null){
+              let elementId= this.props.tabName+'_'+qnNum+"Checkbox"+previousAnswer[qnNum];
+              document.getElementById(elementId).setAttribute('checked',true);
+            }
+          }
+        }
+      ).catch(
+        (err) => {
+          alert('서버에 문제가 있습니다');
+        }
+      )
   }
 
   render() {
@@ -101,7 +151,8 @@ class TypeTestQn extends React.Component {
                   <label>
                     <input
                       type="checkbox"
-                      className= {this.props.tabName+"Qn"+this.props.questionNum+"Checkboxs"}  
+                      className= {this.props.tabName+"Qn"+this.props.questionNum+"Checkboxs"}
+                      id={this.props.tabName+"_qn_"+this.props.questionNum+"Checkbox"+option.num}  
                       value={option.num}
                       onChange={this.handleChange}
                       style={{

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../css/tab.css";
 import Question from "./Question";
 import contentFile from "../data/content.json";
@@ -107,24 +107,42 @@ function Tab(props) {
         )
     }
 
-    function getTypeBtnVisibility(tabName){
-        if(tabName==='love'){
+    function getTypeBtnVisibility(tabName) {
+        if (tabName === 'love') {
             return 'visible'
-        }else{
+        } else {
             return 'hidden'
         }
     }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : false;
+    }
+
+
+    const child = useRef();
+
+    useEffect(() => {
+        if ( JSON.parse( getCookie('login') ) )  {
+            child.current.checkPreviosAnswer();
+        } 
+    });
 
     return (
         <div className={props.tabNum === props.clickedTabNum ? "tabContent  activeTabcontent" : "tabContent"}   >
             {props.qnList.map(
                 (qnNum) =>
                     <div  >
-                        {/* <Question key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></Question> */}
-                        <TypeTestQn key={qnNum} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></TypeTestQn>
+                        {props.tabName === 'love'
+                            ? <TypeTestQn key={qnNum} ref={child} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></TypeTestQn>
+                            : <Question key={qnNum} ref={child} questionNum={qnNum} tabName={props.tabName} qnStatement={props.qnStatement[qnNum]} options={props.optionsInsingleTab[qnNum]} qnType={props.qnTypes[qnNum]} ></Question>
+                        }
                     </div>
             )}
-            <button id="getTypeBtn" type="button" onClick={reqType} style={{ visibility : getTypeBtnVisibility(props.tabName) }}  >TYPE 확인</button>
+            <button id="getTypeBtn" type="button" onClick={reqType} style={{ visibility: getTypeBtnVisibility(props.tabName) }}  >TYPE 확인</button>
         </div>
     )
 }

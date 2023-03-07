@@ -14,7 +14,6 @@ import axios from "axios";
 
 let MainPage = () => {
 
-
     const movePage = useNavigate();
 
     function goToLogin() {
@@ -54,7 +53,7 @@ let MainPage = () => {
           )
     }
 
-    function checkLoginStatus(){
+    function checkLoginStatusOfSignedCookie(){
         let cookie = document.cookie;
         if(cookie.indexOf('login=')>-1){
             // login cookie exist
@@ -70,7 +69,13 @@ let MainPage = () => {
             // login cookie doesn't exist
             return false;
         }
-       
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : false;
     }
 
     function loginVisibility(boolean){
@@ -96,42 +101,6 @@ let MainPage = () => {
             return 'none'
         }
     }
-
-    function reqType(){
-        let body = {
-          }
-      
-            axios({
-              method: 'post',
-              url: '/reqType',
-              validateStatus: function (status) {
-                return status >= 200 && status < 300; // default
-              },
-              data: body,
-              timeout: 5000
-            }).then(
-              (res) => {
-                  alert("투표 되었습니다")
-              }
-            ).catch(
-              (err) => {
-                try {
-                  if(err.response.status==401){
-                    alert('로그인을 먼저 해야 투표할수 있습니다');
-                  }else if(err.response.status==400){
-                    alert('두번 이상 투표할수 없습니다');
-                  }else{
-                    alert('서버에 문제가 있습니다');
-                  }
-                } catch (error) {
-                  //server timeout
-                  alert('서버에 문제가 있습니다');
-                }
-              }
-            )
-      
-    }
-    
   
     return (
         <div  >
@@ -150,17 +119,15 @@ let MainPage = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎논쟁
                         </Typography>
-                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(checkLoginStatus())  }}  >로그인</Button>
-                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(checkLoginStatus())  }} >회원가입</Button>
-                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(checkLoginStatus())  }}  >로그아웃</Button>
+                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(getCookie("login"))  }}  >로그인</Button>
+                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(getCookie("login"))  }} >회원가입</Button>
+                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(getCookie("login"))  }}  >로그아웃</Button>
                         <Button color="inherit" onClick={goToContact} >Contact</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
 
             <Tabs className='mainPage' ></Tabs>
-            {/* <TypeTestTab></TypeTestTab> */}
-
         </div>
     );
 

@@ -57,7 +57,7 @@ connection.connect();
 const cookieConfig = {
   httpOnly: false,
   maxAge: 1209600000,  // 14 days
-  signed: true
+  signed: false
 }
 
 //sens
@@ -222,12 +222,12 @@ function updateVotingResult(tabName, checkedOption, gender, questionNum, variabl
 //when user check option
 app.post('/questionAnswer', async (req, res) => {
   try {
-    if (req.signedCookies.login === 'false') {
+    if (req.cookies.login === 'false') {
       //check login 
       res.status(401);
       res.send();
     }
-    let id = req.signedCookies.id;
+    let id = req.cookies.id;
     let checkedOption = req.body.checkedOption;
     let questionNum = req.body.questionNum;
     let gender = await selectGender(id);
@@ -559,6 +559,45 @@ function isTelNumAvaliable(telNum, tableName) {
   })
 }
 
+
+function selectIdAndPassword(telNum, tableName) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `select id, password from ${tableName} where tel_num= '${telNum}'`
+    }
+    connection.query(sql)
+      .then((dbRes) => {
+        resolve(dbRes.rows[0]);
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+  })
+}
+
+
+function isTelNumRegistered(telNum, tableName) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `select id from ${tableName} where tel_num= '${telNum}'`
+    }
+    connection.query(sql)
+      .then((dbRes) => {
+        if (dbRes.rows.length === 0) {
+          //telNum haven't been signed up
+          resolve(false);
+        } else {
+          //telnum have been signed up
+          resolve(true);
+        }
+      })
+      .catch((err) => {
+        reject(new Error(err));
+      })
+  })
+}
+
+
 //authentication
 app.post('/reqAuth', limiter, async (req, res) => {
   try {
@@ -601,7 +640,7 @@ app.post('/reqAuth', limiter, async (req, res) => {
 //authentication
 app.post('/sendAuthNum', async (req, res) => {
   try {
-    let telNum = req.signedCookies.telNum;
+    let telNum = req.cookies.telNum;
     let authNumFromBrowser = req.body.authNum;
     let dbRes = await getAuthNum(telNum);
     if (dbRes.rows.length === 0) {
@@ -612,10 +651,10 @@ app.post('/sendAuthNum', async (req, res) => {
       let origionalAuthNum = dbRes.rows[0].auth_num;
       if (authNumFromBrowser === origionalAuthNum) {
         //signup success
-        let id = req.signedCookies.id;
-        let password = req.signedCookies.password;
-        let gender = req.signedCookies.gender;
-        let birthday = req.signedCookies.birthday;
+        let id = req.cookies.id;
+        let password = req.cookies.password;
+        let gender = req.cookies.gender;
+        let birthday = req.cookies.birthday;
         res.cookie('login', 'true', cookieConfig);
         res.clearCookie('password');
         res.clearCookie('gender');
@@ -636,6 +675,78 @@ app.post('/sendAuthNum', async (req, res) => {
     res.send();
   }
 })
+
+
+//authentication
+app.post('/reqAuthToFindId', limiter, async (req, res) => {
+  try {
+    const unixTime = Date.now().toString(); // Millisec
+    let telNum = req.body.telNum;
+    if (await isTelNumRegistered(telNum, 'userinfo')) {
+      const authNum = getRandomInteger(1000, 9999).toString();
+      let content = `인증번호는 [${authNum}]입니다`;
+      let signature = makeSignature(unixTime, 'POST', sens_secret_key, sens_access_key, sensSmsApiPath);
+      callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+        sens_calling_number, '82', telNum, content).then((sensRes) => {
+          //sensSmsApi success
+          res.cookie('telNum', telNum, cookieConfig);
+          res.send();
+          insertAuthNum(telNum, authNum);
+        }).catch((err) => {
+          //sensSmsApi error
+          res.status(400);
+          res.send()
+        })
+
+      //send sms to me 
+      // callSensSmsApi('POST', sensSmsApiUrl, sens_access_key, unixTime, signature,
+      //   sens_calling_number, '82', '01094162506', content).then((sensRes) => {
+      //   }).catch((err) => {
+      //   })
+
+    } else {
+      // telNum haven't been signed up
+      res.status(401);
+      res.send();
+    }
+  } catch (error) {
+    //server error
+    res.status(500);
+    res.send();
+  }
+})
+
+//authentication
+app.post('/sendAuthNumToFindId', async (req, res) => {
+  try {
+    let telNum = req.cookies.telNum;
+    let authNumFromBrowser = req.body.authNum;
+    let dbRes = await getAuthNum(telNum);
+    if (dbRes.rows.length === 0) {
+      //vaild time of authNum is over
+      res.status(408);
+      res.send();
+    } else {
+      let origionalAuthNum = dbRes.rows[0].auth_num;
+      if (authNumFromBrowser === origionalAuthNum) {
+        //find id success
+        let idAndPassword = await selectIdAndPassword(telNum, 'userinfo');
+        res.cookie('login', 'true', cookieConfig);
+        res.cookie('id', idAndPassword.id, cookieConfig);
+        res.clearCookie('telNum');
+        res.send(idAndPassword);
+      } else {
+        //fail 
+        res.status(401);
+        res.send();
+      }
+    }
+  } catch (error) {
+    res.status(500);
+    res.send();
+  }
+})
+
 
 //when backend send response result to browser
 app.post('/api/responseResult', (req, res) => {
@@ -663,6 +774,45 @@ app.post('/api/responseResult', (req, res) => {
     res.send();
   }
 })
+
+function getPreviosAnswer(id, tabName) {
+  return new Promise((resolve, reject) => {
+    let sql = {
+      text: `SELECT * from ${tabName}_total_voting_result_by_user where id = '${id}';`
+    }
+
+    connection.query(sql)
+      .then((dbRes) => {
+        if(dbRes.rows.length==0){
+          //user have checked nothing
+          reject();
+        }else{
+          //user have checked something
+          resolve(dbRes.rows[0]);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      })
+  })
+}
+
+//authentication
+app.post('/getPreviosAnswer', async (req, res) => {
+  try {
+    let id = req.cookies.id;
+    let tabName = req.body.tabName;
+
+    let previousAnswer = await getPreviosAnswer( id, tabName );
+    res.send(previousAnswer);
+
+  } catch (error) {
+    //server error
+    res.status(500);
+    res.send();
+  }
+})
+
 
 //logout
 app.get('/logout', (req, res) => {
@@ -720,7 +870,7 @@ function selectVotingResultByUser(qnType, yhtiArr, id) {
 
 app.post('/reqType', async (req, res) => {
   try {
-    let id = req.signedCookies.id;
+    let id = req.cookies.id;
     let yhtiArr = [];
 
     for (let qnType in loveYhtiTypes) {
@@ -732,11 +882,7 @@ app.post('/reqType', async (req, res) => {
       yhtiStr += yhtiArr[i];
     }
 
-    res.cookie('yhti', yhtiStr, {
-      httpOnly: false,
-      maxAge: 1209600000,  // 14 days
-      signed: false
-    });
+    res.cookie('yhti', yhtiStr, cookieConfig);
     res.send();
   } catch (err) {
     if (err.code == 400) {

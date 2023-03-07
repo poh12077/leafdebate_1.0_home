@@ -45,7 +45,7 @@
     width: 70%;
     /* height: 100vh; */
     height: 90%;
-    max-height: 400px;
+    max-height: 470px;
     position: relative;
     border-radius: 1em;
     box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
@@ -72,7 +72,7 @@ input:focus {
 }
 
 .login-btn {
-    width: 40%;
+    width: 70%;
     height: 4vh;
     background-color: rgb(32, 177, 255);
     display: flex;
@@ -100,7 +100,7 @@ input:focus {
 
     .loginCover {
         width: 30%;
-        height: 65%;
+        height: 70%;
     }
 
     .signupCover {
@@ -117,7 +117,7 @@ input:focus {
 
     .loginCover {
         width: 25%;
-        height: 60%;
+        height: 65%;
     }
 
     .signupCover {
