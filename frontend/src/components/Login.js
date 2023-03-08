@@ -67,7 +67,7 @@ function goToFindId() {
   }
 
   let sendAccount = () => {
-    const url = '/sendAccount';
+    const url = process.env.REACT_APP_BACKEND+'/sendAccount';
     const formData = new FormData();
     formData.append('id', inputs.id);
     formData.append('password', inputs.password);

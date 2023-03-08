@@ -10,7 +10,7 @@
                         "2. 안돼",
                         "3. 미쳤어? 헤어져"
                     ],
-                    "qnType":"a"
+                    "qnType":"giving"
 
                 },
                 {
@@ -20,12 +20,12 @@
                         "2. 안돼",
                         "3. 미쳤어? 헤어져"
                     ],
-                    "qnType":"b"
+                    "qnType":"giving"
                 }
             ]
         },
         {
-            "tabName" : "marriage",
+            "tabName" : "politics",
             "qn":[
                 {
                     "statement":"qn00",

@@ -43,7 +43,7 @@ function Auth() {
 
         axios({
             method: 'post',
-            url: '/reqAuth',
+            url: process.env.REACT_APP_BACKEND+'/reqAuth',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },
@@ -83,7 +83,7 @@ function Auth() {
 
         axios({
             method: 'post',
-            url: '/sendAuthNum',
+            url: process.env.REACT_APP_BACKEND+'/sendAuthNum',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },

@@ -45,7 +45,7 @@ function Signup() {
 
         axios({
             method: 'post',
-            url: '/sendSignupInfo',
+            url: process.env.REACT_APP_BACKEND+'/sendSignupInfo',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },

@@ -6,7 +6,6 @@ import RadarChart from "./RadarChart";
 import BarChart from "./BarChart";
 import Test from './Test';
 
-
 class Question extends React.Component {
 
   constructor(props) {
@@ -18,6 +17,11 @@ class Question extends React.Component {
       questionNum: 0,
       qnType:""
     }
+
+    // const meta = document.createElement('meta');
+    // meta.name = "viewport";
+    // meta.content = "width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no, viewport-fit=cover";
+    // document.getElementsByTagName('head')[0].appendChild(meta);
   }
 
   handleChange = (e) => {
@@ -58,7 +62,7 @@ class Question extends React.Component {
 
       axios({
         method: 'post',
-        url: '/questionAnswer',
+        url: process.env.REACT_APP_BACKEND+'/questionAnswer',
         validateStatus: function (status) {
           return status >= 200 && status < 300; // default
         },
@@ -95,20 +99,6 @@ class Question extends React.Component {
     ));
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
-
-  // componentDidMount() {
-  //   if(this.getCookie('login')){
-  //     if(n===0){
-  //       this.checkPreviosAnswer();
-  //       n++;
-  //     }
-
-  //   }else{
-
-  //   }
-
-  // }
-
   
   checkPreviosAnswer(){
     let body = {
@@ -117,7 +107,7 @@ class Question extends React.Component {
 
       axios({
         method: 'post',
-        url: '/getPreviosAnswer',
+        url: process.env.REACT_APP_BACKEND+'/getPreviosAnswer',
         validateStatus: function (status) {
           return status >= 200 && status < 300; // default
         },
@@ -140,8 +130,6 @@ class Question extends React.Component {
       )
   }
 
-
-
   render() {
     return (
         <form className="form" onSubmit={this.handleFormSubmit}>
@@ -157,6 +145,8 @@ class Question extends React.Component {
                       id={this.props.tabName+"_qn_"+this.props.questionNum+"Checkbox"+option.num}  
                       value={option.num}
                       onChange={this.handleChange}
+                      style={{width:"17px", height:"17px"}}
+                      // style={{width:"3vw", height:"3vh"}}
                     /> {option.statement}
                   </label>
                   <br />

@@ -69,7 +69,7 @@ class BarChart extends React.Component {
 
     axios({
       method:'post',
-      url: '/api/responseResult',
+      url: process.env.REACT_APP_BACKEND+'/api/responseResult',
       validateStatus: function (status) {
         return status >= 200 && status < 300; // default
       },

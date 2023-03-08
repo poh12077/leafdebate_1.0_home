@@ -66,7 +66,7 @@ class RadarChart extends Component {
       gender: 'male',
       questionNum: this.props.questionNum
     }
-    axios.post('/api/responseResult', body)
+    axios.post(process.env.REACT_APP_BACKEND+'/api/responseResult', body)
       .then(
         (res) => {
           this.setState(

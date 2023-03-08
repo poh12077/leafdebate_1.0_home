@@ -11,7 +11,9 @@ const CryptoJS = require("crypto-js");
 const axios = require("axios");
 const rateLimit = require("express-rate-limit");
 const path = require('path');
+// const cors = require('cors');
 
+// app.use(cors());
 let securityConf = fs.readFileSync( path.resolve(__dirname, './conf/securityConf.json') );
 securityConf = JSON.parse(securityConf);
 
@@ -55,9 +57,11 @@ const connection = new pg.Pool({
 connection.connect();
 
 const cookieConfig = {
-  httpOnly: false,
+  httpOnly: false,      //allow browser to access cookie
   maxAge: 1209600000,  // 14 days
-  signed: false
+  signed: false        //encription  
+  // sameSite:'none',  //cors 
+  //secure:'true'      //https
 }
 
 //sens

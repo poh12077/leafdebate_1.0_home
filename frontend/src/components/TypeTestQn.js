@@ -6,7 +6,6 @@ import RadarChart from "./RadarChart";
 import BarChart from "./BarChart";
 import Test from './Test';
 
-
 class TypeTestQn extends React.Component {
 
   constructor(props) {
@@ -58,7 +57,7 @@ class TypeTestQn extends React.Component {
 
       axios({
         method: 'post',
-        url: '/questionAnswer',
+        url: process.env.REACT_APP_BACKEND+'/questionAnswer',
         validateStatus: function (status) {
           return status >= 200 && status < 300; // default
         },
@@ -96,28 +95,14 @@ class TypeTestQn extends React.Component {
     return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-  // componentDidMount() {
-  //   if(this.getCookie('login')){
-  //     if(n===0){
-  //       this.checkPreviosAnswer();
-  //       n++;
-  //     }
-
-  //   }else{
-
-  //   }
-
-  // }
-
-
   checkPreviosAnswer(){
     let body = {
       tabName: this.props.tabName
     }
-
+    
       axios({
         method: 'post',
-        url: '/getPreviosAnswer',
+        url: process.env.REACT_APP_BACKEND+'/getPreviosAnswer',
         validateStatus: function (status) {
           return status >= 200 && status < 300; // default
         },
@@ -149,17 +134,17 @@ class TypeTestQn extends React.Component {
             {
               this.state.options.map(option => (
                   <label>
-                    <input
+                    <input 
                       type="checkbox"
                       className= {this.props.tabName+"Qn"+this.props.questionNum+"Checkboxs"}
                       id={this.props.tabName+"_qn_"+this.props.questionNum+"Checkbox"+option.num}  
                       value={option.num}
                       onChange={this.handleChange}
                       style={{
-                        marginLeft:"2vw",
-                        marginRight:"2vw",
-                        marginTop:"2vh",
-                        marginBottom:"1vh"
+                        // marginLeft:"2vw",
+                        // marginRight:"2vw",
+                        // marginTop:"2vh",
+                        // marginBottom:"1vh"
                       }}
                     /> 
                   </label>

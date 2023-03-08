@@ -43,7 +43,7 @@ function Auth() {
 
         axios({
             method: 'post',
-            url: '/reqAuthToFindId',
+            url: process.env.REACT_APP_BACKEND+'/reqAuthToFindId',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },
@@ -83,7 +83,7 @@ function Auth() {
 
         axios({
             method: 'post',
-            url: '/sendAuthNumToFindId',
+            url: process.env.REACT_APP_BACKEND+'/sendAuthNumToFindId',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },

@@ -1,25 +1,25 @@
-* {
+
+/* mobile */
+@media  (max-width: 600px) {
+
+  * {
     box-sizing: border-box;
-    /* margin: 0;
-    padding: 0; */
   }
-  
+
   .tabContainer {
     display: flex;
     flex-direction: column;
     position: relative;
-    width:90%;
-    max-width: 600px;
+    width: 90vw;
     height: 100%;
     background: #f1f1f1;
-    /* background-color: azure; */
     margin: 100px auto 0;
     word-break: break-all;
     border: 1px solid rgba(0, 0, 0, 0.274);
-    
+
   }
-  
-  #getTypeBtn{
+
+  #getTypeBtn {
     margin-top: 5vh;
     width: 50vw;
     height: 40px;
@@ -27,10 +27,11 @@
     max-width: 300px;
 
   }
+
   .tabMenu {
     display: flex;
-    /* flex-direction: column; */
   }
+
   .tab {
     border: none;
     padding: 15px;
@@ -43,51 +44,193 @@
     position: relative;
     outline: none;
     font-size: 1.3em;
-    
+
   }
-  .tab:not(:last-child){
+
+  .tab:not(:last-child) {
     border-right: 1px solid rgba(0, 0, 0, 0.274);
   }
-  
-  .activeTab  {
-    /* background: white; */
+
+  .activeTab {
     background-color: aliceblue;
     border-bottom: 1px solid transparent;
   }
-  
-  .activeTab::before {
-    /* content: "";
-    display: block;
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% + 2px);
-    height: 5px;
-    background: rgb(88, 147, 241); */
-  }
- 
-  
+
   .tabContentWrapper {
-    flex-grow : 1;
-    /* height: 100%; */
+    flex-grow: 1;
   }
-  
+
   .tabContent {
-    /* background: white; */
     background-color: aliceblue;
-    padding: 17px;
-    /* padding: 5vw; */
+    /* padding: 17px; */
+    padding: 4vw;
     width: 100%;
     height: 100%;
     display: none;
-    /* text-align: center; */
   }
-  
+
   .activeTabcontent {
     display: block;
     text-align: center;
   }
-  
-  
-  
+
+}
+
+
+/*  tablet */
+
+@media (min-width: 601px) and (max-width: 991px){
+
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .tabContainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 60vw;
+    max-width: 600px;
+    height: 100%;
+    background: #f1f1f1;
+    margin: 100px auto 0;
+    word-break: break-all;
+    border: 1px solid rgba(0, 0, 0, 0.274);
+
+  }
+
+  #getTypeBtn {
+    margin-top: 5vh;
+    width: 50vw;
+    height: 40px;
+    border-radius: 20px;
+    max-width: 300px;
+
+  }
+
+  .tabMenu {
+    display: flex;
+  }
+
+  .tab {
+    border: none;
+    padding: 15px;
+    text-align: center;
+    width: 50%;
+    background: rgba(128, 128, 128, 0.075);
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.274);
+    box-sizing: content-box;
+    position: relative;
+    outline: none;
+    font-size: 1.3em;
+
+  }
+
+  .tab:not(:last-child) {
+    border-right: 1px solid rgba(0, 0, 0, 0.274);
+  }
+
+  .activeTab {
+    background-color: aliceblue;
+    border-bottom: 1px solid transparent;
+  }
+
+  .tabContentWrapper {
+    flex-grow: 1;
+  }
+
+  .tabContent {
+    background-color: aliceblue;
+    padding: 2vw;
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  .activeTabcontent {
+    display: block;
+    text-align: center;
+  }
+
+
+}
+
+/* laptop dektop */
+
+@media only screen and (min-width: 992px) {
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .tabContainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 50vw;
+    max-width: 800px;
+    height: 100%;
+    background: #f1f1f1;
+    margin: 100px auto 0;
+    word-break: break-all;
+    border: 1px solid rgba(0, 0, 0, 0.274);
+
+  }
+
+  #getTypeBtn {
+    margin-top: 5vh;
+    width: 50vw;
+    height: 40px;
+    border-radius: 20px;
+    max-width: 300px;
+
+  }
+
+  .tabMenu {
+    display: flex;
+  }
+
+  .tab {
+    border: none;
+    padding: 15px;
+    text-align: center;
+    width: 50%;
+    background: rgba(128, 128, 128, 0.075);
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.274);
+    box-sizing: content-box;
+    position: relative;
+    outline: none;
+    font-size: 1.3em;
+
+  }
+
+  .tab:not(:last-child) {
+    border-right: 1px solid rgba(0, 0, 0, 0.274);
+  }
+
+  .activeTab {
+    background-color: aliceblue;
+    border-bottom: 1px solid transparent;
+  }
+
+  .tabContentWrapper {
+    flex-grow: 1;
+  }
+
+  .tabContent {
+    background-color: aliceblue;
+    padding: 2vw;
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  .activeTabcontent {
+    display: block;
+    text-align: center;
+  }
+
+}

@@ -31,7 +31,7 @@ let MainPage = () => {
     function logout(){
         axios({
             method: 'get',
-            url: '/logout',
+            url: process.env.REACT_APP_BACKEND+'/logout',
             validateStatus: function (status) {
               return status >= 200 && status < 300; // default
             },

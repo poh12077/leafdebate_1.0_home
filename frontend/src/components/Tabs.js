@@ -79,7 +79,7 @@ function Tab(props) {
         }
         axios({
             method: 'post',
-            url: '/reqType',
+            url: process.env.REACT_APP_BACKEND+'/reqType',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },
