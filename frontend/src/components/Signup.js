@@ -25,7 +25,12 @@ function Signup() {
     
     const handleSubmit = (event) => {
         event.preventDefault();
-        sendSignupInfo();
+        if( isInputValid() ){
+            sendSignupInfo();
+        }else{
+            alert("입력되지 않은 정보가 있거나 잘못된 입력 정보가 있습니다.")
+        }
+        
     }
    
     const handleChange = (event) => {
@@ -34,6 +39,21 @@ function Signup() {
         setInputs(values => ({ ...values, [name]: value }))
     }
     
+    function isInputValid(){
+        let pattern = /\s/g; // tab, space
+
+        if(inputs.id===undefined || inputs.password===undefined || inputs.gender===undefined){
+            return false;
+        }else if(inputs.id==="" || inputs.password==="" ){
+            return false;
+        }else if ( inputs.id.match(pattern) || inputs.password.match(pattern) ){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
     function sendSignupInfo() {
         let body = {
             id: inputs.id,

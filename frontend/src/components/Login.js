@@ -38,26 +38,45 @@ function goToFindId() {
   movePage('/FindId');
 }
 
+function isInputValid(){
+  let pattern = /\s/g; // tab, space
+
+  if(inputs.id===undefined || inputs.password===undefined ){
+      return false;
+  }else if(inputs.id==="" || inputs.password==="" ){
+      return false;
+  }else if ( inputs.id.match(pattern) || inputs.password.match(pattern) ){
+      return false;
+  }
+  else{
+      return true;
+  }
+}
 
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    sendAccount().then(
-      () => {
-        movePage('/MainPage');
-        alert('로그인 되었습니다')
-      }
-    ).catch(
-      (err) => {
-        if (err.response.data == 1) {
-          alert('비밀번호가 틀렸습니다');
-        } else if (err.response.data == 2) {
-          alert('아이디가 틀렸습니다');
-        } else {
-          alert('서버에 문제가 있습니다');
+    if( isInputValid() ){
+      sendAccount().then(
+        () => {
+          movePage('/MainPage');
+          alert('로그인 되었습니다')
         }
-      }
-    );
+      ).catch(
+        (err) => {
+          if (err.response.data == 1) {
+            alert('비밀번호가 틀렸습니다');
+          } else if (err.response.data == 2) {
+            alert('아이디가 틀렸습니다');
+          } else {
+            alert('서버에 문제가 있습니다');
+          }
+        }
+      );
+    }else{
+      alert("입력되지 않은 정보가 있거나 잘못된 입력 정보가 있습니다.")
+    }
+
   }
 
   const handleChange = (event) => {

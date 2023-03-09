@@ -24,6 +24,24 @@ function Auth() {
         movePage('/MainPage');
     }
 
+    function isTelnumValid(){
+        let pattern = /\s/g; // tab, space
+
+        if( inputs.telNum===undefined){
+            return false;
+        }else if( inputs.telNum.indexOf('-') !== -1 ){
+            // there is '-' in the telnum
+            return false;
+        }else if ( inputs.telNum.match(pattern)  ){
+            return false;
+        }else if ( inputs.telNum==='' ){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
         sendAuthNum();
@@ -36,38 +54,43 @@ function Auth() {
 
     const reqAuth = (event) => {
         event.preventDefault();
-        disableBtn();
-        let body = {
-            telNum: inputs.telNum
-        }
 
-        axios({
-            method: 'post',
-            url: process.env.REACT_APP_BACKEND+'/reqAuth',
-            validateStatus: function (status) {
-                return status >= 200 && status < 300; // default
-            },
-            data: body,
-            timeout: 5000
-        }).then(
-            (res) => {
-                    alert('인증 요청하였습니다');
+        if( isTelnumValid() ){
+            disableBtn();
+            let body = {
+                telNum: inputs.telNum
             }
-        ).catch(
-            (err) => {
-                if(err.response.status==401){
-                    alert('이미 가입되어 있는 휴대폰 번호입니다.');
-                }else if(err.response.status==400){
-                    alert('sens sms api server error.');
-                }else if(err.response.status==429){
-                    alert('3분 이후에 다시 요청하시기 바랍니다')
-                }else if (err.response.status==500){
-                    alert('서버에 문제가 있습니다.');
-                }else{
-                    alert('서버에 문제가 있습니다.');
+    
+            axios({
+                method: 'post',
+                url: process.env.REACT_APP_BACKEND+'/reqAuth',
+                validateStatus: function (status) {
+                    return status >= 200 && status < 300; // default
+                },
+                data: body,
+                timeout: 5000
+            }).then(
+                (res) => {
+                        alert('인증 요청하였습니다');
                 }
-            }
-        )
+            ).catch(
+                (err) => {
+                    if(err.response.status==401){
+                        alert('이미 가입되어 있는 휴대폰 번호입니다.');
+                    }else if(err.response.status==400){
+                        alert('sens sms api server error.');
+                    }else if(err.response.status==429){
+                        alert('3분 이후에 다시 요청하시기 바랍니다')
+                    }else if (err.response.status==500){
+                        alert('서버에 문제가 있습니다.');
+                    }else{
+                        alert('서버에 문제가 있습니다.');
+                    }
+                }
+            )
+        }else{
+            alert("핸드폰번호 숫자만 입력하세요")
+        }
     }
 
     const handleChange = (event) => {
