@@ -15,7 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 
 
-function Auth() {
+function FindId() {
     const [inputs, setInputs] = useState({});
 
     const movePage = useNavigate();
@@ -43,7 +43,7 @@ function Auth() {
 
         axios({
             method: 'post',
-            url: process.env.REACT_APP_BACKEND+'/reqAuthToFindId',
+            url: process.env.REACT_APP_BACKEND+'/reqAuthToFindOrDeleteId',
             validateStatus: function (status) {
                 return status >= 200 && status < 300; // default
             },
@@ -119,17 +119,8 @@ function Auth() {
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            회원가입
+                            {/* 회원가입 */}
                         </Typography>
                         <Button id="mainPageBtn" color="inherit" onClick={goToMainPage} >mainPage</Button>
                     </Toolbar>
@@ -164,4 +155,4 @@ function Auth() {
     )
 }
 
-export default Auth;
+export default FindId;

@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import axios from "axios";
 import { fontSize } from '@mui/system';
+import AppBarMenu from "./AppBarMenu"; 
 
 let MainPage = () => {
 
@@ -24,10 +25,7 @@ let MainPage = () => {
     function goToSignup() {
         movePage('/Signup');
     }
-
-    function goToContact() {
-        movePage('/Contact');
-    }
+  
 
     function logout(){
         axios({
@@ -76,10 +74,11 @@ let MainPage = () => {
         let matches = document.cookie.match(new RegExp(
             "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
         ));
-        return matches ? decodeURIComponent(matches[1]) : false;
+        return matches ? decodeURIComponent(matches[1]) : null;
     }
 
-    function loginVisibility(boolean){
+    function loginVisibility(input){
+        let boolean = (input==='true');
         if(boolean){
             return 'none'
         }else{
@@ -87,7 +86,8 @@ let MainPage = () => {
         }
     }
 
-    function signupVisibility(boolean){
+    function signupVisibility(input){
+        let boolean = (input==='true');
         if(boolean){
             return 'none'
         }else{
@@ -95,7 +95,8 @@ let MainPage = () => {
         }
     }
 
-    function logoutVisibility(boolean){
+    function logoutVisibility(input){
+        let boolean = (input==='true');
         if(boolean){
             return 'inline'
         }else{
@@ -108,22 +109,13 @@ let MainPage = () => {
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar>
-                        {/* <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            sx={{ mr: 2 }}
-                        >
-                            <MenuIcon />
-                        </IconButton> */}
+                        <AppBarMenu ></AppBarMenu>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            깻잎논쟁
+                            {/* 깻잎논쟁 */}
                         </Typography>
                         <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(getCookie("login")) , fontSize:"large" }}  >로그인</Button>
                         <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(getCookie("login")) , fontSize:"large"  }} >회원가입</Button>
                         <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(getCookie("login")) , fontSize:"large"  }}  >로그아웃</Button>
-                        <Button color="inherit" onClick={goToContact} >Contact</Button>
                     </Toolbar>
                 </AppBar>
             </Box>

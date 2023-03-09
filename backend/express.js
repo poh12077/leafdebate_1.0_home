@@ -14,7 +14,7 @@ const path = require('path');
 // const cors = require('cors');
 
 // app.use(cors());
-let securityConf = fs.readFileSync( path.resolve(__dirname, './conf/securityConf.json') );
+let securityConf = fs.readFileSync(path.resolve(__dirname, './conf/securityConf.json'));
 securityConf = JSON.parse(securityConf);
 
 //sens ddos security configure
@@ -31,10 +31,10 @@ app.use(multer.array());
 const cookieSecretKey = 'dbstjrduf12#$';
 app.use(cookieParser(cookieSecretKey));
 
-let dbConf = fs.readFileSync( path.resolve(__dirname, './conf/dbConf.json')  );
+let dbConf = fs.readFileSync(path.resolve(__dirname, './conf/dbConf.json'));
 dbConf = JSON.parse(dbConf);
 
-let sensConf = fs.readFileSync( path.resolve(__dirname, './conf/sensConf.json') );
+let sensConf = fs.readFileSync(path.resolve(__dirname, './conf/sensConf.json'));
 sensConf = JSON.parse(sensConf);
 
 // const connection = new pg.Client({
@@ -73,13 +73,13 @@ const sensSmsApiDomain = sensConf.sensSmsApiDomain;
 const sensSmsApiPath = `/sms/v2/services/${sens_service_id}/messages`;
 const sensSmsApiUrl = sensSmsApiDomain + sensSmsApiPath;
 
-let contentFile = fs.readFileSync( path.resolve(__dirname, '../frontend/src/data/content.json' ) );
+let contentFile = fs.readFileSync(path.resolve(__dirname, '../frontend/src/data/content.json'));
 contentFile = JSON.parse(contentFile);
 let tabNames = [];
 
 parseContentFile(contentFile, tabNames, [], [], [], [], []);
 
-let loveYhtiTypes = fs.readFileSync( path.resolve(__dirname, '../frontend/src/data/yhtiType.json') );
+let loveYhtiTypes = fs.readFileSync(path.resolve(__dirname, '../frontend/src/data/yhtiType.json'));
 loveYhtiTypes = JSON.parse(loveYhtiTypes);
 
 function parseContentFile(content, tabNames, qnTypes, qnStatement, tabSize, tabPages, optionStatement) {
@@ -208,7 +208,7 @@ function updateVotingResultByUser(id, qnType, checkedOption, qnNum, tabName) {
   })
 }
 
-function updateVotingResult(tabName, checkedOption, gender, questionNum, variable ) {
+function updateVotingResult(tabName, checkedOption, gender, questionNum, variable) {
   return new Promise((resolve, reject) => {
     let sql = {
       text: `UPDATE ${tabName}_${gender}_voting_result SET option_${checkedOption} = option_${checkedOption} + ${variable} WHERE qn_num = ${questionNum};`
@@ -226,10 +226,11 @@ function updateVotingResult(tabName, checkedOption, gender, questionNum, variabl
 //when user check option
 app.post('/questionAnswer', async (req, res) => {
   try {
-    if (req.cookies.login === 'false') {
+    if (req.cookies.login !== 'true'  ) {
       //check login 
       res.status(401);
       res.send();
+      return;
     }
     let id = req.cookies.id;
     let checkedOption = req.body.checkedOption;
@@ -239,12 +240,12 @@ app.post('/questionAnswer', async (req, res) => {
     let qnType = req.body.qnType;
     let previousUserAnswer = await selectTotalVotingResultByUser(tabName, questionNum, id);
 
-    if (previousUserAnswer !== null ) {
+    if (previousUserAnswer !== null) {
       //user have answered
-      if(checkedOption==previousUserAnswer){
+      if (checkedOption == previousUserAnswer) {
         //user checked same option with previous answer  
         res.send();
-      }else{
+      } else {
         //user checked different option with previous answer
         updateVotingResult(tabName, previousUserAnswer, gender, questionNum, -1).catch(() => {
           res.status(500);
@@ -359,7 +360,7 @@ function insertIdIntoVotingResultByUser(id) {
 
 function insertIdIntoTotalVotingResultByUser(id) {
   return new Promise((resolve, reject) => {
-    tabNames.map((tabName)=>{
+    tabNames.map((tabName) => {
       let sql = {
         text: `insert into ${tabName}_total_voting_result_by_user values ('${id}');`
       }
@@ -682,7 +683,7 @@ app.post('/sendAuthNum', async (req, res) => {
 
 
 //authentication
-app.post('/reqAuthToFindId', limiter, async (req, res) => {
+app.post('/reqAuthToFindOrDeleteId', limiter, async (req, res) => {
   try {
     const unixTime = Date.now().toString(); // Millisec
     let telNum = req.body.telNum;
@@ -751,6 +752,97 @@ app.post('/sendAuthNumToFindId', async (req, res) => {
   }
 })
 
+function deleteIdByType(id, tabName) {
+
+    for (let qnType in loveYhtiTypes) {
+      let sql = {
+        text: `delete from ${tabName}_${qnType}_voting_result_by_user where id = '${id}'`
+      }
+      connection.query(sql)
+        .then(() => {
+
+        }).catch((err) => {
+          //bug
+          console.log(err)
+        })
+    }
+
+    let sql = {
+      text: `delete from ${tabName}_total_voting_result_by_user where id = '${id}'`
+    }
+    connection.query(sql)
+      .then(() => {
+
+      }).catch((err) => {
+        //bug
+        console.log(err)
+      })
+
+}
+
+
+function deleteIdBesideTypeTable(id, tabName) {
+  return new Promise((resolve, reject) => {
+
+    let sql = {
+      text: `delete from ${tabName}_total_voting_result_by_user where id = '${id}'`
+    }
+    connection.query(sql)
+      .then(() => {
+
+      }).catch((err) => {
+          //bug
+          console.log(err);
+      })
+
+    sql = {
+      text: `delete from userinfo where id = '${id}'`
+    }
+    connection.query(sql)
+      .then(() => {
+        resolve();
+      }).catch((err) => {
+          reject(err);
+      })
+  })
+}
+
+
+//authentication
+app.post('/sendAuthNumToDeleteId', async (req, res) => {
+  try {
+    let telNum = req.cookies.telNum;
+    let authNumFromBrowser = req.body.authNum;
+    let dbRes = await getAuthNum(telNum);
+    if (dbRes.rows.length === 0) {
+      //vaild time of authNum is over
+      res.status(408);
+      res.send();
+    } else {
+      let origionalAuthNum = dbRes.rows[0].auth_num;
+      if (authNumFromBrowser === origionalAuthNum) {
+        //authNum is correct
+        let idAndPassword = await selectIdAndPassword(telNum, 'userinfo');
+        let id = idAndPassword.id;
+        deleteIdByType(id, 'love');
+        await deleteIdBesideTypeTable(id,'politics');
+
+        res.clearCookie('login');
+        res.clearCookie('id');
+        res.clearCookie('telNum');
+        res.send();
+      } else {
+        //authNum is wrong
+        res.status(401);
+        res.send();
+      }
+    }
+  } catch (error) {
+    res.status(500);
+    res.send();
+  }
+})
+
 
 //when backend send response result to browser
 app.post('/api/responseResult', (req, res) => {
@@ -787,10 +879,10 @@ function getPreviosAnswer(id, tabName) {
 
     connection.query(sql)
       .then((dbRes) => {
-        if(dbRes.rows.length==0){
+        if (dbRes.rows.length == 0) {
           //user have checked nothing
           reject();
-        }else{
+        } else {
           //user have checked something
           resolve(dbRes.rows[0]);
         }
@@ -807,7 +899,7 @@ app.post('/getPreviosAnswer', async (req, res) => {
     let id = req.cookies.id;
     let tabName = req.body.tabName;
 
-    let previousAnswer = await getPreviosAnswer( id, tabName );
+    let previousAnswer = await getPreviosAnswer(id, tabName);
     res.send(previousAnswer);
 
   } catch (error) {
