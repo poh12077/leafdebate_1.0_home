@@ -36,7 +36,7 @@ let Contact = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎 논쟁
                         </Typography>
-                        <Button color="inherit" onClick={goToMainPage} >Main Page</Button>
+                        <Button color="inherit" onClick={goToMainPage} id="mainPageBtn" >Main Page</Button>
                     </Toolbar>
                 </AppBar>
             </Box>

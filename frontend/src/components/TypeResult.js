@@ -42,7 +42,7 @@ let TypeResult = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎 논쟁
                         </Typography>
-                        <Button color="inherit" onClick={goToMainPage} >Main Page</Button>
+                        <Button id="mainPageBtn" color="inherit" onClick={goToMainPage} >Main Page</Button>
                     </Toolbar>
                 </AppBar>
             </Box>

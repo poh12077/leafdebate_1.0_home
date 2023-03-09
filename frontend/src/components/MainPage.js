@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import axios from "axios";
+import { fontSize } from '@mui/system';
 
 let MainPage = () => {
 
@@ -119,9 +120,9 @@ let MainPage = () => {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             깻잎논쟁
                         </Typography>
-                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(getCookie("login"))  }}  >로그인</Button>
-                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(getCookie("login"))  }} >회원가입</Button>
-                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(getCookie("login"))  }}  >로그아웃</Button>
+                        <Button id='loginBtn' color="inherit" onClick={goToLogin} style={{ display : loginVisibility(getCookie("login")) , fontSize:"large" }}  >로그인</Button>
+                        <Button id='signupBtn' color="inherit" onClick={goToSignup} style={{  display : signupVisibility(getCookie("login")) , fontSize:"large"  }} >회원가입</Button>
+                        <Button id ='logoutBtn' color="inherit" onClick={logout} style={{ display : logoutVisibility(getCookie("login")) , fontSize:"large"  }}  >로그아웃</Button>
                         <Button color="inherit" onClick={goToContact} >Contact</Button>
                     </Toolbar>
                 </AppBar>

@@ -1,24 +1,55 @@
-/* --------------------------- MOBILE VERSION ------------------------------ */
+#genderSignup {
+    display: flex;
+    /* font-size: 0.8em; */
+}
 
-    .page {
-        height: 100vh;
-        /* height: 100%; */
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        /* background-color: aliceblue; */
-    }
+.genderRadio {
+    /* margin: 10px; */
+}
 
-    #genderSignup {
-        display: flex;
-        font-size: 0.8em;
-    }
+.loginInput {
+    border: 1px solid lightslategray;
+    width: 80%;
+    height: 6vh;
+    border-radius: 0.5em;
+    text-align: center;
+    /* padding: 2em; */
+    font-size: large;
+}
 
-    .genderRadio {
-        /* margin: 10px; */
-    }
+input:focus {
+    outline-color: rgb(32, 177, 255);
+}
 
+.login-btn {
+    width: 70%;
+    height: 4vh;
+    background-color: rgb(32, 177, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.5s;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-size: large;
+}
+
+.login-btn:hover {
+    transform: scale(1.25);
+}
+
+.page {
+    height: 80vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: red; */
+}
+
+
+@media (max-width: 600px) {
+  
     .signupCover {
         background-color: white;
         width: 70%;
@@ -51,67 +82,83 @@
         font-size: 1.5em;
     }
 
-
-    .loginInput {
-        border: 1px solid lightslategray;
-        width: 80%;
-        height: 6vh;
-        border-radius: 0.5em;
-        text-align: center;
-        /* padding: 2em; */
-        font-size: 0.75em;
-    }
-
-    input:focus {
-        outline-color: rgb(32, 177, 255);
-    }
-
-    .login-btn {
-        width: 70%;
-        height: 4vh;
-        background-color: rgb(32, 177, 255);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: 0.5s;
-        border-radius: 0.5em;
-        cursor: pointer;
-    }
-
-    .login-btn:hover {
-        transform: scale(1.25);
-    }
-
-
-@media only screen and (min-device-width: 37em) {
-    .page {
-        font-size: 0.8em;
-    }
-
-    .loginCover {
-        width: 30%;
-        height: 70%;
-    }
-
-    .signupCover {
-        width: 30%;
-        height: 65%;
-    }
 }
 
-@media only screen and (min-device-width: 64em) {
-    .page {
-        font-size: 0.7em;
+/* tablet */
+
+@media (min-width: 601px) and (max-width: 991px) {
+
+    
+    .signupCover {
+        background-color: white;
+        width: 50%;
+        /* height: 70vh; */
+        height: 60%;
+        position: relative;
+        border-radius: 1em;
+        box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        font-size: 1.5em;
     }
 
     .loginCover {
-        width: 25%;
-        height: 65%;
+        background-color: white;
+        width: 50%;
+        /* height: 70vh; */
+        height: 70%;
+        position: relative;
+        border-radius: 1em;
+        box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        font-size: 1.5em;
     }
 
+}
+
+
+/* dektop, laptop */
+
+@media only screen and (min-width: 992px) {
+
+   
     .signupCover {
-        width: 25%;
-        height: 60%;
+        background-color: white;
+        width: 30%;
+        max-width: 600px;
+        /* height: 70vh; */
+        height: 70%;
+        max-height: 600px;
+        position: relative;
+        border-radius: 1em;
+        box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        font-size: 1.5em;
     }
-} 
- 
+
+    .loginCover {
+        background-color: white;
+        width: 30%;
+        max-width: 600px;
+        /* height: 70vh; */
+        height: 80%;
+        max-height: 700px;
+        position: relative;
+        border-radius: 1em;
+        box-shadow: 0 0.188em 1.550em rgb(156, 156, 156);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        font-size: 1.5em;
+    }
+
+}

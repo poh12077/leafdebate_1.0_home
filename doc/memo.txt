@@ -30,7 +30,10 @@ react build 해서 배포하기( https 요구됨)
 -데스크탑에서 휴대폰번호 입력 ui 크게
 - ui 대략 수정
 - 질문 수정
+-회원탈퇴
+- type 확인, 회원탈퇴, contact 버튼 모으기
 
+로그인, 회원가입, 휴대폰인증 ui 는 material-ui 활용
 
 
 

@@ -145,7 +145,7 @@ class Question extends React.Component {
                       id={this.props.tabName+"_qn_"+this.props.questionNum+"Checkbox"+option.num}  
                       value={option.num}
                       onChange={this.handleChange}
-                      style={{width:"17px", height:"17px"}}
+                      // style={{width:"17px", height:"17px"}}
                       // style={{width:"3vw", height:"3vh"}}
                     /> {option.statement}
                   </label>

@@ -14,10 +14,7 @@
     box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.5);
     text-align: left;
     border-radius: 25px;
-}
-
-.fieldset{
-    border-radius: 25px;
+   
 }
 
 .formButton
@@ -32,4 +29,29 @@
 }
 
 
+@media (max-width: 600px) {
+
+  .fieldset{
+    border-radius: 25px;
+}
+
+}
   
+
+
+@media (min-width: 601px) and (max-width: 991px) {
+  .fieldset{
+    border-radius: 25px;
+    font-size: 1.1em;
+}
+
+}
+
+
+@media only screen and (min-width: 992px) {
+  .fieldset{
+    border-radius: 25px;
+    font-size: 1.4em;
+}
+
+}

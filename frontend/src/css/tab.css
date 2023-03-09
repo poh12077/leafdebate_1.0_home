@@ -1,4 +1,7 @@
 
+
+
+
 /* mobile */
 @media  (max-width: 600px) {
 
@@ -25,6 +28,7 @@
     height: 40px;
     border-radius: 20px;
     max-width: 300px;
+   
 
   }
 
@@ -90,8 +94,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    width: 60vw;
-    max-width: 600px;
+    width: 80vw;
+    /* max-width: 700px; */
     height: 100%;
     background: #f1f1f1;
     margin: 100px auto 0;
@@ -106,6 +110,7 @@
     height: 40px;
     border-radius: 20px;
     max-width: 300px;
+    font-size: 1.1em;
 
   }
 
@@ -143,7 +148,7 @@
 
   .tabContent {
     background-color: aliceblue;
-    padding: 2vw;
+    padding: 4vw;
     width: 100%;
     height: 100%;
     display: none;
@@ -169,8 +174,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    width: 50vw;
-    max-width: 800px;
+    width: 60vw;
+    max-width: 1000px;
     height: 100%;
     background: #f1f1f1;
     margin: 100px auto 0;
@@ -185,6 +190,7 @@
     height: 40px;
     border-radius: 20px;
     max-width: 300px;
+    font-size: 1.2em;
 
   }
 
@@ -203,7 +209,7 @@
     box-sizing: content-box;
     position: relative;
     outline: none;
-    font-size: 1.3em;
+    font-size: 1.5em;
 
   }
 
@@ -222,7 +228,7 @@
 
   .tabContent {
     background-color: aliceblue;
-    padding: 2vw;
+    padding: 3vw;
     width: 100%;
     height: 100%;
     display: none;

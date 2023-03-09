@@ -109,7 +109,7 @@ function goToFindId() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               로그인
             </Typography>
-            <Button color="inherit" onClick={goToMainPage} >MainPage</Button>
+            <Button id="mainPageBtn" color="inherit" onClick={goToMainPage} >MainPage</Button>
           </Toolbar>
         </AppBar>
       </Box>

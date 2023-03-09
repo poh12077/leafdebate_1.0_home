@@ -131,7 +131,7 @@ function Auth() {
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             회원가입
                         </Typography>
-                        <Button color="inherit" onClick={goToMainPage} >mainPage</Button>
+                        <Button id="mainPageBtn" color="inherit" onClick={goToMainPage} >mainPage</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
